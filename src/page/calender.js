@@ -52,11 +52,9 @@ const CalndarInfo = () => {
   const closeSetOnData = () => {
     setOnModal(false);
   };
-
-  const { data } = useQuery("onLoadData", onLoadData);
+  //처음 랜더링 시 모든 정보를 가져오는 리액트 쿼리
+  const { data, refetch } = useQuery("onLoadData", onLoadData);
   console.log(data);
-
-  //웹브라우저가 랜더링 될 때 실행할 함수
 
   //달력을 선택하면 실행 될 함수
   const onSelectDateCell = (value) => {

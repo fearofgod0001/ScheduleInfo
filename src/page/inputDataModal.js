@@ -90,13 +90,18 @@ const InputDataModal = (props) => {
     setUserMemo(e.target.value);
   };
 
-  const sendData = useMutation("submit", submit);
+  const sendData = useMutation(submit, {
+    onSuccess: () => {},
+  });
+
+  const { data, refetch } = useQuery("onLoadData", onLoadData);
   const onSubmit = () => {
     sendData.mutate({
       user_id: userId,
       todo_memo: userMemo,
       todo_date: calDate,
     });
+    refetch();
     close();
   };
 
