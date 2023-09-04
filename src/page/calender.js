@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { styled } from "styled-components";
-import Axios from "../api/Axios";
 import { Calendar } from "antd";
 import { UserContext } from "../context/contextApi";
 import InputDataModal from "./inputDataModal";
 import locale from "antd/es/calendar/locale/ko_KR";
+import { useQuery } from "react-query";
+import { onLoadData } from "../service/portal/calendar";
 
 const Container = styled.div`
   width: 100%;
@@ -51,15 +52,14 @@ const CalndarInfo = () => {
   const closeSetOnData = () => {
     setOnModal(false);
   };
+
+  const { data } = useQuery("onLoadData", onLoadData);
+  console.log(data);
+
   //웹브라우저가 랜더링 될 때 실행할 함수
   useEffect(() => {
-    const onLoadClanderData = async () => {
-      const responce = await Axios.onLoadData();
-      console.log(responce.data);
-      setOnData(responce.data);
-    };
-    onLoadClanderData();
-  }, []);
+    setOnData(data);
+  }, [data]);
 
   //달력을 선택하면 실행 될 함수
   const onSelectDateCell = (value) => {
@@ -87,7 +87,7 @@ const CalndarInfo = () => {
       if (valueData === onData[i].todo_date) {
         //배열에 넣어준다.
         matchingTodos.push(
-          <div className="todo" key={onData[i].user_id}>
+          <div className="todo" key={onData[i].calender_id}>
             <div className="todoUserId">{onData[i].user_id}</div>
             <div className="todoMemo">{onData[i].todo_memo}</div>
           </div>
@@ -97,6 +97,9 @@ const CalndarInfo = () => {
     return <div>{matchingTodos}</div>;
   };
 
+  const checkValue = (e) => {
+    console.log(e);
+  };
   return (
     <Container>
       {onModal === true && (
@@ -106,6 +109,7 @@ const CalndarInfo = () => {
         onSelect={onSelectDateCell}
         cellRender={onCellRender}
         locale={locale}
+        onPanelChange={checkValue}
       />
     </Container>
   );

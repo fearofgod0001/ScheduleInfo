@@ -1,7 +1,10 @@
 import React, { useState, useContext } from "react";
 import { styled } from "styled-components";
-import Axios from "../api/Axios";
 import { UserContext } from "../context/contextApi";
+import { useMutation } from "react-query";
+import { submit } from "../service/portal/calendar";
+import { useQuery } from "react-query";
+import { onLoadData } from "../service/portal/calendar";
 
 const Container = styled.div`
   position: absolute;
@@ -87,11 +90,13 @@ const InputDataModal = (props) => {
     setUserMemo(e.target.value);
   };
 
-  const submit = async () => {
-    const responceSubmit = await Axios.submit(userId, userMemo, calDate);
-    console.log(responceSubmit);
-    const responceLoadData = await Axios.onLoadData();
-    setOnData(responceLoadData.data);
+  const sendData = useMutation("submit", submit);
+  const onSubmit = () => {
+    sendData.mutate({
+      user_id: userId,
+      todo_memo: userMemo,
+      todo_date: calDate,
+    });
     close();
   };
 
@@ -106,7 +111,7 @@ const InputDataModal = (props) => {
           type="text"
           className="userId"
           placeholder="유저 id 를 입력하세요"
-          value={userId}
+          value={userId || ""}
           onChange={onChageUserId}
         />
         <textarea
@@ -115,7 +120,7 @@ const InputDataModal = (props) => {
           value={userMemo}
           onChange={onChageMemo}
         />
-        <button className="submitButton" onClick={submit}>
+        <button className="submitButton" onClick={onSubmit}>
           확인
         </button>
       </div>
