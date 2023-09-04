@@ -45,7 +45,7 @@ const Container = styled.div`
 const CalndarInfo = () => {
   //날짜를 저장할 context
   const context = useContext(UserContext);
-  const { setCalDate, onData, setOnData } = context;
+  const { setCalDate } = context;
   //모달창을 띄울 useState
   const [onModal, setOnModal] = useState(false);
   //모달을 닫을 함수
@@ -57,9 +57,6 @@ const CalndarInfo = () => {
   console.log(data);
 
   //웹브라우저가 랜더링 될 때 실행할 함수
-  useEffect(() => {
-    setOnData(data);
-  }, [data]);
 
   //달력을 선택하면 실행 될 함수
   const onSelectDateCell = (value) => {
@@ -83,13 +80,13 @@ const CalndarInfo = () => {
     //여러개 todo를 받을 배열
     const matchingTodos = [];
     //onData에는 전체 일정을 받아올 수 있다.
-    for (let i in onData) {
-      if (valueData === onData[i].todo_date) {
+    for (let i in data) {
+      if (valueData === data[i].todo_date) {
         //배열에 넣어준다.
         matchingTodos.push(
-          <div className="todo" key={onData[i].calender_id}>
-            <div className="todoUserId">{onData[i].user_id}</div>
-            <div className="todoMemo">{onData[i].todo_memo}</div>
+          <div className="todo" key={data[i].calender_id}>
+            <div className="todoUserId">{data[i].user_id}</div>
+            <div className="todoMemo">{data[i].todo_memo}</div>
           </div>
         );
       }

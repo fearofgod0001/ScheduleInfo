@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { styled } from "styled-components";
 import { UserContext } from "../context/contextApi";
 import { useMutation } from "react-query";
@@ -78,7 +78,7 @@ const InputDataModal = (props) => {
   const { close } = props;
   //날짜를 저장할 context
   const context = useContext(UserContext);
-  const { calDate, setOnData } = context;
+  const { calDate } = context;
   //유저의 정보와 값을 담을 useState
   const [userId, setUserId] = useState();
   const [userMemo, setUserMemo] = useState();
