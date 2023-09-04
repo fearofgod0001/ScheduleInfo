@@ -75,7 +75,7 @@ const Container = styled.div`
 
 const InputDataModal = (props) => {
   //부모로 받을 props값
-  const { close } = props;
+  const { close, refetchOnLoadData } = props;
   //날짜를 저장할 context
   const context = useContext(UserContext);
   const { calDate } = context;
@@ -90,20 +90,27 @@ const InputDataModal = (props) => {
     setUserMemo(e.target.value);
   };
 
-  const sendData = useMutation(submit, {
-    onSuccess: () => {},
-  });
+  const {
+    data: dataSubmit,
+    mutate: mutateSubmit,
+    isSuccess: isSuccessSubmit,
+  } = useMutation("submit", submit);
 
-  const { data, refetch } = useQuery("onLoadData", onLoadData);
   const onSubmit = () => {
-    sendData.mutate({
+    mutateSubmit({
       user_id: userId,
       todo_memo: userMemo,
       todo_date: calDate,
     });
-    refetch();
-    close();
   };
+
+  useEffect(() => {
+    if (isSuccessSubmit && dataSubmit) {
+      console.debug("## submit refetch => ", dataSubmit);
+
+      refetchOnLoadData();
+    }
+  }, [isSuccessSubmit, dataSubmit, refetchOnLoadData]);
 
   return (
     <Container>

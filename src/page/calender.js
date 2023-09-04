@@ -53,8 +53,10 @@ const CalndarInfo = () => {
     setOnModal(false);
   };
   //처음 랜더링 시 모든 정보를 가져오는 리액트 쿼리
-  const { data, refetch } = useQuery("onLoadData", onLoadData);
-  console.log(data);
+  const { data: dataOnLoadData, refetch: refetchOnLoadData } = useQuery(
+    "onLoadData",
+    onLoadData
+  );
 
   //달력을 선택하면 실행 될 함수
   const onSelectDateCell = (value) => {
@@ -78,13 +80,13 @@ const CalndarInfo = () => {
     //여러개 todo를 받을 배열
     const matchingTodos = [];
     //onData에는 전체 일정을 받아올 수 있다.
-    for (let i in data) {
-      if (valueData === data[i].todo_date) {
+    for (let i in dataOnLoadData) {
+      if (valueData === dataOnLoadData[i].todo_date) {
         //배열에 넣어준다.
         matchingTodos.push(
-          <div className="todo" key={data[i].calender_id}>
-            <div className="todoUserId">{data[i].user_id}</div>
-            <div className="todoMemo">{data[i].todo_memo}</div>
+          <div className="todo" key={dataOnLoadData[i].calender_id}>
+            <div className="todoUserId">{dataOnLoadData[i].user_id}</div>
+            <div className="todoMemo">{dataOnLoadData[i].todo_memo}</div>
           </div>
         );
       }
@@ -98,7 +100,11 @@ const CalndarInfo = () => {
   return (
     <Container>
       {onModal === true && (
-        <InputDataModal open={onModal} close={closeSetOnData} />
+        <InputDataModal
+          open={onModal}
+          close={closeSetOnData}
+          refetchOnLoadData={refetchOnLoadData}
+        />
       )}
       <Calendar
         onSelect={onSelectDateCell}
