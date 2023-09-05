@@ -1,4 +1,4 @@
-import { callApi } from "../../api/axiosInstance";
+import { callApi } from "../../common/axios/axiosInstance";
 
 export const onLoadData = async () => {
   return await callApi({

@@ -6,6 +6,8 @@ import InputDataModal from "./inputDataModal";
 import locale from "antd/es/calendar/locale/ko_KR";
 import { useQuery } from "react-query";
 import { onLoadData } from "../service/portal/calendar";
+import useCalendarData from "../common/hooks/useCalendar";
+import { calendarData } from "../recoil/atom/calendarData";
 
 const Container = styled.div`
   width: 100%;
@@ -46,6 +48,9 @@ const CalndarInfo = () => {
   //날짜를 저장할 context
   const context = useContext(UserContext);
   const { setCalDate } = context;
+  //리코일로 전역변수 사용
+  const [onCalendarData, setOnCalendarData] = useCalendarData(calendarData);
+
   //모달창을 띄울 useState
   const [onModal, setOnModal] = useState(false);
   //모달을 닫을 함수
@@ -66,6 +71,8 @@ const CalndarInfo = () => {
     const monthData = String(value.$M + 1).padStart(2, "0");
     const dayData = String(value.$D).padStart(2, "0");
     setCalDate(value.$y + "-" + monthData + "-" + dayData);
+    setOnCalendarData(dataOnLoadData);
+    console.debug("## debug => ", onCalendarData);
   };
 
   //달력에서 받아오는 값과 데이터에서 가져오는 값을 비교함.

@@ -108,6 +108,7 @@ const InputDataModal = (props) => {
     if (isSuccessSubmit && dataSubmit) {
       console.debug("## submit refetch => ", dataSubmit);
       refetchOnLoadData();
+      close();
     }
   }, [isSuccessSubmit, dataSubmit, refetchOnLoadData]);
 
