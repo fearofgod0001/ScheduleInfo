@@ -18,7 +18,11 @@ const Container = styled.div`
       left: 0;
       right: 0;
     }
-
+    .rbc-day-bg {
+      &:hover {
+        background-color: #ccc;
+      }
+    }
     .rbc-addons-dnd-over {
       background-color: rgba(
         red($date-selection-bg-color),
