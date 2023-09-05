@@ -145,6 +145,7 @@ const BigCalendarInfo = () => {
     []
   );
 
+  //이벤트 이동 기능
   const moveEvent = useCallback(
     ({ event, start, end, isAllDay: droppedOnAllDaySlot = false }) => {
       const { allDay } = event;
@@ -159,11 +160,17 @@ const BigCalendarInfo = () => {
     },
     [setMyEvents]
   );
-
+  //새로운 이벤트 입력 기능
   const newEvent = useCallback(
-    (event) => {
+    (event, start, end) => {
       setMyEvents((prev) => {
         console.log(prev);
+        //입력 받을 창
+        const title = window.prompt("New Event Name");
+        if (title) {
+          setMyEvents((prev) => [...prev, { start, end, title }]);
+        }
+        //드래그 해서 시작과 끝을 찾을 창
         const idList = prev.map((item) => item.id);
         const newId = Math.max(...idList) + 1;
         return [...prev, { ...event, id: newId }];
@@ -198,7 +205,7 @@ const BigCalendarInfo = () => {
     },
     [draggedEvent, counters, setDraggedEvent, setCounters, newEvent]
   );
-
+  //일정 리사이즈 기능
   const resizeEvent = useCallback(
     ({ event, start, end }) => {
       setMyEvents((prev) => {
@@ -208,6 +215,12 @@ const BigCalendarInfo = () => {
       });
     },
     [setMyEvents]
+  );
+
+  //이름 클릭했을 때 나오는 얼럿
+  const handleSelectEvent = useCallback(
+    (event) => window.alert(event.title),
+    []
   );
 
   return (
@@ -233,6 +246,7 @@ const BigCalendarInfo = () => {
         dragFromOutsideItem={displayDragItemInCell ? dragFromOutsideItem : null}
         onDragOver={customOnDragOver}
         onSelectSlot={newEvent}
+        onSelectEvent={handleSelectEvent}
         onDropFromOutside={onDropFromOutside}
         resizable
         selectable
