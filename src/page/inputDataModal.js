@@ -107,7 +107,6 @@ const InputDataModal = (props) => {
   useEffect(() => {
     if (isSuccessSubmit && dataSubmit) {
       console.debug("## submit refetch => ", dataSubmit);
-
       refetchOnLoadData();
     }
   }, [isSuccessSubmit, dataSubmit, refetchOnLoadData]);
