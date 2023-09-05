@@ -102,8 +102,44 @@ const Container = styled.div`
 const BigCalendarInfo = () => {
   const DragAndDropCalendar = withDragAndDrop(Calendar);
 
-  const [myEvents, setMyEvents] = useState(events);
-  console.log(myEvents);
+  const adjEvents = events.map((it, ind) => ({
+    ...it,
+    isDraggable: ind % 2 === 0,
+  }));
+
+  const formatName = (name, count) => `${name} ID ${count}`;
+
+  const [myEvents, setMyEvents] = useState(adjEvents);
+  const [draggedEvent, setDraggedEvent] = useState();
+  const [displayDragItemInCell, setDisplayDragItemInCell] = useState(true);
+  const [counters, setCounters] = useState({ item1: 0, item2: 0 });
+
+  const eventPropGetter = useCallback(
+    (event) => ({
+      ...(event.isDraggable
+        ? { className: "isDraggable" }
+        : { className: "nonDraggable" }),
+    }),
+    []
+  );
+  const handleDragStart = useCallback((event) => setDraggedEvent(event), []);
+
+  const dragFromOutsideItem = useCallback(() => draggedEvent, [draggedEvent]);
+
+  const customOnDragOver = useCallback(
+    (dragEvent) => {
+      if (draggedEvent !== "undroppable") {
+        console.log("preventDefault");
+        dragEvent.preventDefault();
+      }
+    },
+    [draggedEvent]
+  );
+
+  const handleDisplayDragItemInCell = useCallback(
+    () => setDisplayDragItemInCell((prev) => !prev),
+    []
+  );
 
   const moveEvent = useCallback(
     ({ event, start, end, isAllDay: droppedOnAllDaySlot = false }) => {
@@ -120,6 +156,45 @@ const BigCalendarInfo = () => {
     [setMyEvents]
   );
 
+  const newEvent = useCallback(
+    (event) => {
+      setMyEvents((prev) => {
+        console.log(prev);
+        const idList = prev.map((item) => item.id);
+        const newId = Math.max(...idList) + 1;
+        return [...prev, { ...event, id: newId }];
+      });
+    },
+    [setMyEvents]
+  );
+
+  const onDropFromOutside = useCallback(
+    ({ start, end, allDay: isAllDay }) => {
+      if (draggedEvent === "undroppable") {
+        setDraggedEvent(null);
+        return;
+      }
+
+      const { name } = draggedEvent;
+      const event = {
+        title: formatName(name, counters[name]),
+        start,
+        end,
+        isAllDay,
+      };
+      setDraggedEvent(null);
+      setCounters((prev) => {
+        const { [name]: count } = prev;
+        return {
+          ...prev,
+          [name]: count + 1,
+        };
+      });
+      newEvent(event);
+    },
+    [draggedEvent, counters, setDraggedEvent, setCounters, newEvent]
+  );
+
   const resizeEvent = useCallback(
     ({ event, start, end }) => {
       setMyEvents((prev) => {
@@ -133,12 +208,30 @@ const BigCalendarInfo = () => {
 
   return (
     <Container>
+      {Object.entries(counters).map(([name, count]) => (
+        <div
+          draggable="true"
+          key={name}
+          onDragStart={() =>
+            handleDragStart({ title: formatName(name, count), name })
+          }
+        >
+          {formatName(name, count)}
+        </div>
+      ))}
       <DragAndDropCalendar
         localizer={momentLocalizer(moment)}
         events={myEvents}
         onEventDrop={moveEvent}
         onEventResize={resizeEvent}
+        draggableAccessor="isDraggable"
+        eventPropGetter={eventPropGetter}
+        dragFromOutsideItem={displayDragItemInCell ? dragFromOutsideItem : null}
+        onDragOver={customOnDragOver}
+        onSelectSlot={newEvent}
+        onDropFromOutside={onDropFromOutside}
         resizable
+        selectable
         style={{ height: 500 }}
         components={{ toolbar: Toolbar }}
       />
