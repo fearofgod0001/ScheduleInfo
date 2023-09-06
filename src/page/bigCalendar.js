@@ -4,10 +4,11 @@ import moment from "moment";
 import Toolbar from "./Toolbar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
-import events from "../page/events";
 import { styled } from "styled-components";
 import { useQuery } from "react-query";
 import { onLoadData } from "../service/portal/calendar";
+import { useMutation } from "react-query";
+import { submit } from "../service/portal/calendar";
 
 const Container = styled.div`
   .rbc-addons-dnd {
@@ -110,17 +111,14 @@ const BigCalendarInfo = () => {
   //캘린더를 DragAndDrop으로 바꿉니다.
   const DragAndDropCalendar = withDragAndDrop(Calendar);
 
-  // const formatName = (name, count) => `${name} ID ${count}`;
-
   //유즈쿼리로 데이터를 받아옵니다.
   const { data: dataOnLoadData, refetch: refetchOnLoadData } = useQuery(
     "onLoadData",
     onLoadData
   );
-  console.log("## check dataOnLoadData ==>", dataOnLoadData);
 
   //오라클 에서 들어오는 DATE 값을 JAVASCRIPT양식으로 바꿔주는 함수
-  function formatOracleDate(oracleDateStr) {
+  function formatToJSDate(oracleDateStr) {
     return new Date(oracleDateStr);
   }
   //가져올 이벤트를 넣을 useState.
@@ -133,49 +131,14 @@ const BigCalendarInfo = () => {
       //isDraggable: ind % 2 === 0 순서 나누기 2 즉 홀수 인 인자들만 움직일 수 있다.
       const adjEvents = Object.values(dataOnLoadData).map((data, ind) => ({
         ...data,
-        start: formatOracleDate(data.start),
-        end: formatOracleDate(data.end),
+        start: formatToJSDate(data.start),
+        end: formatToJSDate(data.end),
         // isDraggable: ind % 2 === 0,
         // isDraggable: true,
       }));
       setMyEvents(adjEvents);
-      console.log("## check adjEvents!!! ==>", adjEvents);
     }
   }, [dataOnLoadData]);
-
-  // const [draggedEvent, setDraggedEvent] = useState();
-  // const [displayDragItemInCell, setDisplayDragItemInCell] = useState(true);
-  // const [counters, setCounters] = useState({ item1: 0, item2: 0 });
-
-  //이벤트의 draggle 여부를 확인하여 가져온다. isDraggle외에도 다른 객체들을 반환한다.
-  // const eventPropGetter = useCallback(
-  //   (event) => ({
-  //     ...(event.isDraggable
-  //       ? { className: "isDraggable" }
-  //       : { className: "nonDraggable" }),
-  //   }),
-  //   []
-  // );
-
-  // const handleDragStart = useCallback((event) => setDraggedEvent(event), []);
-
-  // const dragFromOutsideItem = useCallback(() => draggedEvent, [draggedEvent]);
-
-  //표 밖의 외부 값들을 새로운 값으로 드래그 할 때 가능 여부를 파악한다.
-  // const customOnDragOver = useCallback(
-  //   (dragEvent) => {
-  //     if (draggedEvent !== "undroppable") {
-  //       console.log("preventDefault");
-  //       dragEvent.preventDefault();
-  //     }
-  //   },
-  //   [draggedEvent]
-  // );
-
-  // const handleDisplayDragItemInCell = useCallback(
-  //   () => setDisplayDragItemInCell((prev) => !prev),
-  //   []
-  // );
 
   //이벤트 이동 기능
   const moveEvent = useCallback(
@@ -195,15 +158,38 @@ const BigCalendarInfo = () => {
     [setMyEvents]
   );
 
+  //새로운 값을 입력할 유즈쿼리문
+  const {
+    data: dataSubmit,
+    mutate: mutateSubmit,
+    isSuccess: isSuccessSubmit,
+  } = useMutation("submit", submit);
+
+  //DB에 넣을 시간양식 재포맷
+  function formatToOracleDate(jsDateStr) {
+    const date = new Date(jsDateStr);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+  }
+
   //새로운 이벤트 입력 기능
   const newEvent = useCallback(
     (event, start, end) => {
       setMyEvents((prev) => {
-        console.log(prev);
-        console.log(start);
-        console.log(end);
         //입력 받을 창
         const title = window.prompt("New Event Name");
+        console.log("##log prev ==>", prev);
+        console.log("##log event ==>", event);
+        console.log("##log event.start ==>", event.slots[0]);
+        console.log("##log event.end ==>", event.slots[event.slots.length - 1]);
+        mutateSubmit({
+          title: title,
+          start: formatToOracleDate(event.slots[0]),
+          end: formatToOracleDate(event.slots[event.slots.length - 1]),
+        });
         if (title) {
           setMyEvents((prev) => [...prev, { start, end, title }]);
         }
@@ -215,33 +201,13 @@ const BigCalendarInfo = () => {
     },
     [setMyEvents]
   );
-  //외부에서 값을 가져와서 캘린더에 넣는 함수
-  // const onDropFromOutside = useCallback(
-  //   ({ start, end, allDay: isAllDay }) => {
-  //     if (draggedEvent === "undroppable") {
-  //       setDraggedEvent(null);
-  //       return;
-  //     }
-
-  //     const { name } = draggedEvent;
-  //     const event = {
-  //       title: formatName(name, counters[name]),
-  //       start,
-  //       end,
-  //       isAllDay,
-  //     };
-  //     setDraggedEvent(null);
-  //     setCounters((prev) => {
-  //       const { [name]: count } = prev;
-  //       return {
-  //         ...prev,
-  //         [name]: count + 1,
-  //       };
-  //     });
-  //     newEvent(event);
-  //   },
-  //   [draggedEvent, counters, setDraggedEvent, setCounters, newEvent]
-  // );
+  //데이터 입력이 완료되면 리패치를 하여 재랜더링 되게 한다.
+  useEffect(() => {
+    if (isSuccessSubmit && dataSubmit) {
+      console.debug("## submit refetch => ", dataSubmit);
+      refetchOnLoadData();
+    }
+  }, [isSuccessSubmit, dataSubmit, refetchOnLoadData]);
 
   //일정 리사이즈 할 때 나오는 콜백함수 인자로 event start end가 있다.
   const resizeEvent = useCallback(
@@ -275,14 +241,10 @@ const BigCalendarInfo = () => {
         //사이즈 재정의
         onEventResize={resizeEvent}
         // draggableAccessor="isDraggable"
-        // eventPropGetter={eventPropGetter}
-        // dragFromOutsideItem={displayDragItemInCell ? dragFromOutsideItem : null}
-        // onDragOver={customOnDragOver}
         //새로운 이벤트 생성 함수
         onSelectSlot={newEvent}
         //이벤트 클릭시 실행 함수
         onSelectEvent={handleSelectEvent}
-        // onDropFromOutside={onDropFromOutside}
         resizable
         selectable
         style={{ height: 900 }}
