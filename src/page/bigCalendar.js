@@ -10,18 +10,18 @@ import { useQuery } from "react-query";
 import { onLoadData } from "../service/portal/calendar";
 import { useMutation } from "react-query";
 import { submit } from "../service/portal/calendar";
+import { update } from "../service/portal/calendar";
 
 const Container = styled.div`
   display: flex;
   .leftArticle {
     width: 20%;
     height: 100%;
-    background-color: #ccc;
+    background-color: #f1f1f1;
   }
   .rightArticle {
     width: 80%;
     height: 100%;
-    background-color: #f1f1f1;
   }
   .DragAndDropCalendar {
     width: 100%;
@@ -157,6 +157,21 @@ const BigCalendarInfo = () => {
     }
   }, [dataOnLoadData]);
 
+  //새로운 값을 입력할 유즈쿼리문
+  const {
+    data: dataUpdate,
+    mutate: mutateUpdate,
+    isSuccess: isSuccessUpdate,
+  } = useMutation("update", update);
+
+  //데이터 수정ㅇ 완료되면 리패치를 하여 재랜더링 되게 한다.
+  useEffect(() => {
+    if (isSuccessUpdate && dataUpdate) {
+      console.debug("## submit refetch => ", dataUpdate);
+      refetchOnLoadData();
+    }
+  }, [isSuccessUpdate, dataUpdate, refetchOnLoadData]);
+
   //이벤트 이동 기능
   const moveEvent = useCallback(
     ({ event, start, end, isAllDay: droppedOnAllDaySlot = false }) => {
@@ -167,11 +182,15 @@ const BigCalendarInfo = () => {
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
         const filtered = prev.filter((ev) => ev.id !== event.id);
-        console.debug("## find existing==> ", existing);
         console.debug("## find existing==> ", existing.id);
-        console.debug("## find event==> ", event);
         console.debug("## find start==> ", start);
         console.debug("## find end==> ", end);
+        mutateUpdate({
+          id: existing.id,
+          start: formatToOracleDate(start),
+          end: formatToOracleDate(end),
+        });
+
         return [...filtered, { ...existing, start, end, allDay }];
       });
     },
@@ -187,6 +206,7 @@ const BigCalendarInfo = () => {
 
   //DB에 넣을 시간양식 재포맷
   function formatToOracleDate(jsDateStr) {
+    console.log(jsDateStr);
     const date = new Date(jsDateStr);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -235,8 +255,11 @@ const BigCalendarInfo = () => {
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
         const filtered = prev.filter((ev) => ev.id !== event.id);
-        console.log(start);
-        console.log(end);
+        mutateUpdate({
+          id: existing.id,
+          start: formatToOracleDate(start),
+          end: formatToOracleDate(end),
+        });
         return [...filtered, { ...existing, start, end }];
       });
     },
@@ -259,7 +282,7 @@ const BigCalendarInfo = () => {
           //이벤트 클릭시 실행 함수
           onSelectEvent={handleSelectEvent}
           selectable
-          style={{ height: 400, width: 350 }}
+          style={{ height: 400, width: "100%" }}
           components={{ toolbar: MiniToolbar }}
         />
       </div>
@@ -279,7 +302,7 @@ const BigCalendarInfo = () => {
           onSelectEvent={handleSelectEvent}
           resizable
           selectable
-          style={{ height: 800, width: 1200 }}
+          style={{ height: "100vh", width: "100%" }}
           components={{ toolbar: Toolbar }}
         />
       </div>

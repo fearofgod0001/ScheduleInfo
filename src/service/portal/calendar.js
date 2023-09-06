@@ -15,3 +15,11 @@ export const submit = async (data) => {
     data: { param: data },
   });
 };
+
+export const update = async (data) => {
+  return await callApi({
+    url: "/api/v1/calendar/testupdatedate",
+    method: "POST",
+    data: { param: data },
+  });
+};
