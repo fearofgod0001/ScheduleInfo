@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import Toolbar from "./Toolbar";
+import MiniToolbar from "./miniToolbar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { styled } from "styled-components";
@@ -11,6 +12,22 @@ import { useMutation } from "react-query";
 import { submit } from "../service/portal/calendar";
 
 const Container = styled.div`
+  display: flex;
+  .leftArticle {
+    width: 20%;
+    height: 100%;
+    background-color: #ccc;
+  }
+  .rightArticle {
+    width: 80%;
+    height: 100%;
+    background-color: #f1f1f1;
+  }
+  .DragAndDropCalendar {
+    width: 100%;
+    height: 100%;
+  }
+
   .rbc-addons-dnd {
     .rbc-addons-dnd-row-body {
       position: relative;
@@ -149,9 +166,12 @@ const BigCalendarInfo = () => {
       }
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
-        console.log("## find prev==> ", prev);
-        console.log("## find event==> ", event);
         const filtered = prev.filter((ev) => ev.id !== event.id);
+        console.debug("## find existing==> ", existing);
+        console.debug("## find existing==> ", existing.id);
+        console.debug("## find event==> ", event);
+        console.debug("## find start==> ", start);
+        console.debug("## find end==> ", end);
         return [...filtered, { ...existing, start, end, allDay }];
       });
     },
@@ -214,10 +234,9 @@ const BigCalendarInfo = () => {
     ({ event, start, end }) => {
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
-        console.log(prev);
+        const filtered = prev.filter((ev) => ev.id !== event.id);
         console.log(start);
         console.log(end);
-        const filtered = prev.filter((ev) => ev.id !== event.id);
         return [...filtered, { ...existing, start, end }];
       });
     },
@@ -232,24 +251,38 @@ const BigCalendarInfo = () => {
 
   return (
     <Container>
-      <DragAndDropCalendar
-        localizer={momentLocalizer(moment)}
-        //가져올 이벤트 값
-        events={myEvents}
-        //위치 재정의
-        onEventDrop={moveEvent}
-        //사이즈 재정의
-        onEventResize={resizeEvent}
-        // draggableAccessor="isDraggable"
-        //새로운 이벤트 생성 함수
-        onSelectSlot={newEvent}
-        //이벤트 클릭시 실행 함수
-        onSelectEvent={handleSelectEvent}
-        resizable
-        selectable
-        style={{ height: 900 }}
-        components={{ toolbar: Toolbar }}
-      />
+      <div className="leftArticle">
+        <Calendar
+          localizer={momentLocalizer(moment)}
+          //가져올 이벤트 값
+          events={myEvents}
+          //이벤트 클릭시 실행 함수
+          onSelectEvent={handleSelectEvent}
+          selectable
+          style={{ height: 400, width: 350 }}
+          components={{ toolbar: MiniToolbar }}
+        />
+      </div>
+      <div className="rightArticle">
+        <DragAndDropCalendar
+          localizer={momentLocalizer(moment)}
+          //가져올 이벤트 값
+          events={myEvents}
+          //위치 재정의
+          onEventDrop={moveEvent}
+          //사이즈 재정의
+          onEventResize={resizeEvent}
+          // draggableAccessor="isDraggable"
+          //새로운 이벤트 생성 함수
+          onSelectSlot={newEvent}
+          //이벤트 클릭시 실행 함수
+          onSelectEvent={handleSelectEvent}
+          resizable
+          selectable
+          style={{ height: 800, width: 1200 }}
+          components={{ toolbar: Toolbar }}
+        />
+      </div>
     </Container>
   );
 };
