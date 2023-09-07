@@ -133,6 +133,7 @@ const InputDateModal = (props) => {
     events,
     refetchOnLoadData,
     onFormatChange,
+    formatToShowDate,
   } = props;
   console.log(newEventData);
   //미니 캘린더의 크기를 조절할 스테이트
@@ -140,17 +141,6 @@ const InputDateModal = (props) => {
   const onOpenCalendar = () => {
     if (onCalendar === 0) setOnCalendar(230);
     else setOnCalendar(0);
-  };
-
-  const formatToShowDate = (jsDateStr) => {
-    console.log(jsDateStr);
-    const date = new Date(jsDateStr);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekday = date.getDay();
-    const week = ["일", "월", "화", "수", "목", "금", "토"];
-    const formattedDate = `${month}월 ${day}일 (${week[weekday]}요일)`;
-    return formattedDate;
   };
 
   const [eventTitle, setEventTitle] = useState();

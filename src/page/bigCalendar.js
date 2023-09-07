@@ -227,6 +227,17 @@ const BigCalendarInfo = () => {
     const formattedDate = `${year}-${month}-${day}`;
     return formattedDate;
   };
+  //보여줄 시간 양식을 재포맷
+  const formatToShowDate = (jsDateStr) => {
+    console.log(jsDateStr);
+    const date = new Date(jsDateStr);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const weekday = date.getDay();
+    const week = ["일", "월", "화", "수", "목", "금", "토"];
+    const formattedDate = `${month}월 ${day}일 (${week[weekday]}요일)`;
+    return formattedDate;
+  };
 
   const [onMakeNewEvent, setOnMakeNewEvent] = useState();
   //새로운 이벤트 입력 기능
@@ -296,6 +307,7 @@ const BigCalendarInfo = () => {
         events={myEvents}
         refetchOnLoadData={refetchOnLoadData}
         onFormatChange={formatToOracleDate}
+        formatToShowDate={formatToShowDate}
       />
       <div className="leftArticle">
         <Calendar
@@ -335,9 +347,9 @@ const BigCalendarInfo = () => {
       >
         <SideUpdatePage
           onData={onClickEventData}
-          onClose={openSideMenu}
-          onFormatChange={formatToOracleDate}
+          close={openSideMenu}
           refetchOnLoadData={refetchOnLoadData}
+          formatToShowDate={formatToShowDate}
         />
         /
       </div>

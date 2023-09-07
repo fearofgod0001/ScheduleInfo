@@ -8,40 +8,86 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
   background-color: white;
   border-top-left-radius: 18px;
   border-bottom-left-radius: 18px;
   box-shadow: 10px 15px 20px;
-  .buttonDesign {
-    width: 100px;
-    height: 30px;
+  .topButton {
+    width: 80%;
+    display: flex;
+    justify-content: end;
+  }
+  .closeButton {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
     border: none;
-    font-size: 15px;
-    background-color: white;
+    font-size: 30px;
+    color: #a1a1a1;
     cursor: pointer;
     &:hover {
-      background-color: rgba(49, 116, 173);
+      color: black;
+    }
+  }
+  .buttonDesign {
+    width: 100px;
+    height: 40px;
+    border-radius: 7px;
+    border: none;
+    font-size: 15px;
+    background-color: rgba(49, 116, 173);
+    color: white;
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(49, 116, 173, 0.8);
       color: white;
     }
   }
   .scheduleInfo {
     width: 80%;
-    height: 70%;
-    border: 1px solid #eee;
+    height: 60%;
     .scheduleInfoHead {
-      font-size: 40px;
+      font-size: 35px;
+      margin-top: 10px;
+      background-color: rgba(49, 116, 173);
+      color: white;
+      border-radius: 10px;
     }
+    .scheduleDate {
+      display: flex;
+      justify-content: space-evenly;
+      width: 100%;
+      height: 50px;
+      border-bottom: 1px solid rgba(49, 116, 173);
+      .scheduleInfoDate {
+        width: 140px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+    .todoMemo {
+      margin: 20px 0 0 0;
+      width: 100%;
+    }
+  }
+  .footerButton {
+    width: 80%;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
   }
 `;
 
 const InputDatePage = (props) => {
-  const { onClose, onData, onFormatChange, refetchOnLoadData } = props;
+  const { close, onData, refetchOnLoadData, formatToShowDate } = props;
 
   //창을 닫을 컴포넌트
   const onCloseSidePage = () => {
-    onClose(onData);
+    close(onData);
   };
 
   //데이터를 삭제할 쿼리
@@ -65,6 +111,7 @@ const InputDatePage = (props) => {
     mutateDelete({
       id: onData.id,
     });
+    close(onData);
   };
 
   //데이터를 수정할 컴포넌트
@@ -72,27 +119,31 @@ const InputDatePage = (props) => {
 
   return (
     <Container>
-      <div className="TopButton">
+      <div className="topButton">
+        <button className="closeButton" onClick={onCloseSidePage}>
+          x
+        </button>
+      </div>
+      <div className="scheduleInfo">
+        <div className="scheduleInfoHead">{onData && onData.title}</div>
+        <div className="scheduleDate">
+          <div className="scheduleInfoDate">
+            {onData && formatToShowDate(onData.start)}
+          </div>
+
+          <div className="scheduleInfoDate">
+            {onData && formatToShowDate(onData.end)}
+          </div>
+        </div>
+        <div className="todoMemo">{onData && onData.memo}</div>
+      </div>
+      <div className="footerButton">
         <button className="buttonDesign" onClick={DeleteDate}>
           삭제
         </button>
         <button className="buttonDesign" onClick={UpdateDate}>
           수정
         </button>
-        <button className="buttonDesign" onClick={onCloseSidePage}>
-          닫기
-        </button>
-      </div>
-      <div className="scheduleInfo">
-        <div className="scheduleInfoHead">{onData && onData.title}</div>
-        <div className="scheduleInfoDate">
-          start : {onData && onFormatChange(onData.start)}
-        </div>
-        <div className="scheduleInfoDate">
-          end : {onData && onFormatChange(onData.end)}
-        </div>
-        <div className="todoMemo">memo : {onData && onData.memo}</div>
-        <br />
       </div>
     </Container>
   );
