@@ -1,31 +1,38 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
-import Toolbar from "./Toolbar";
-import MiniToolbar from "./miniToolbar";
+import Toolbar from "./toolbar";
+import ToolbarMini from "./toolbarMini";
+import InputDateModal from "./inputDateModal";
+import SideUpdatePage from "./sideUpdatePage";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { styled } from "styled-components";
 import { useQuery } from "react-query";
-import { onLoadData } from "../service/portal/calendar";
 import { useMutation } from "react-query";
-import { submit } from "../service/portal/calendar";
-import { update } from "../service/portal/calendar";
+import { onLoadData } from "../service/portal/calendar";
+import { submitSchedule } from "../service/portal/calendar";
+import { updateSchedule } from "../service/portal/calendar";
 
 const Container = styled.div`
   display: flex;
+  overflow: hidden;
   .leftArticle {
     width: 20%;
     height: 100%;
     background-color: #f1f1f1;
   }
-  .rightArticle {
+  .middleArticle {
     width: 80%;
     height: 100%;
   }
-  .DragAndDropCalendar {
-    width: 100%;
-    height: 100%;
+  .rightArticle {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    transition: 0.4s ease;
+    z-index: 200;
   }
 
   .rbc-addons-dnd {
@@ -140,6 +147,12 @@ const BigCalendarInfo = () => {
   }
   //가져올 이벤트를 넣을 useState.
   const [myEvents, setMyEvents] = useState([]);
+  //모달창을 띄울 useState
+  const [onModal, setOnModal] = useState(0);
+  //모달을 닫을 함수
+  const closeSetOnData = () => {
+    setOnModal(0);
+  };
 
   //쿼리가 발생하면 데이터를 받아서 이벤트를 가져온다.
   useEffect(() => {
@@ -162,7 +175,7 @@ const BigCalendarInfo = () => {
     data: dataUpdate,
     mutate: mutateUpdate,
     isSuccess: isSuccessUpdate,
-  } = useMutation("update", update);
+  } = useMutation("updateSchedule", updateSchedule);
 
   //데이터 수정ㅇ 완료되면 리패치를 하여 재랜더링 되게 한다.
   useEffect(() => {
@@ -202,10 +215,10 @@ const BigCalendarInfo = () => {
     data: dataSubmit,
     mutate: mutateSubmit,
     isSuccess: isSuccessSubmit,
-  } = useMutation("submit", submit);
+  } = useMutation("submitSchedule", submitSchedule);
 
   //DB에 넣을 시간양식 재포맷
-  function formatToOracleDate(jsDateStr) {
+  const formatToOracleDate = (jsDateStr) => {
     console.log(jsDateStr);
     const date = new Date(jsDateStr);
     const year = date.getFullYear();
@@ -213,27 +226,19 @@ const BigCalendarInfo = () => {
     const day = date.getDate();
     const formattedDate = `${year}-${month}-${day}`;
     return formattedDate;
-  }
+  };
 
+  const [onMakeNewEvent, setOnMakeNewEvent] = useState();
   //새로운 이벤트 입력 기능
   const newEvent = useCallback(
     (event, start, end) => {
       setMyEvents((prev) => {
-        //입력 받을 창
-        const title = window.prompt("New Event Name");
+        setOnModal(500);
         console.log("##log prev ==>", prev);
         console.log("##log event ==>", event);
         console.log("##log event.start ==>", event.slots[0]);
         console.log("##log event.end ==>", event.slots[event.slots.length - 1]);
-        mutateSubmit({
-          title: title,
-          start: formatToOracleDate(event.slots[0]),
-          end: formatToOracleDate(event.slots[event.slots.length - 1]),
-        });
-        if (title) {
-          setMyEvents((prev) => [...prev, { start, end, title }]);
-        }
-        //드래그 해서 시작과 끝을 찾을 창
+        setOnMakeNewEvent(event);
         const idList = prev.map((item) => item.id);
         const newId = Math.max(...idList) + 1;
         return [...prev, { ...event, id: newId }];
@@ -266,14 +271,32 @@ const BigCalendarInfo = () => {
     [setMyEvents]
   );
 
+  const [onSideDate, setOnSideDate] = useState(420);
+  const [onEventId, setOnEventId] = useState();
+  const [onClickEventData, setOnClickEventData] = useState();
+  const openSideMenu = (event) => {
+    setOnEventId(event.id);
+    if (onSideDate === 0 && event.id === onEventId) setOnSideDate(420);
+    else setOnSideDate(0);
+    setOnClickEventData(event);
+  };
   //이름 클릭했을 때 나오는 얼럿 title id allDay Start 등을 볼 수 있다.
   const handleSelectEvent = useCallback(
-    (event) => window.alert(event.title),
+    (event) =>
+      window.alert(`Title: ${event.title}\nMemo: ${event.meno}\n일정입니다.`),
     []
   );
 
   return (
     <Container>
+      <InputDateModal
+        open={onModal}
+        close={closeSetOnData}
+        newEventData={onMakeNewEvent}
+        events={myEvents}
+        refetchOnLoadData={refetchOnLoadData}
+        onFormatChange={formatToOracleDate}
+      />
       <div className="leftArticle">
         <Calendar
           localizer={momentLocalizer(moment)}
@@ -282,11 +305,11 @@ const BigCalendarInfo = () => {
           //이벤트 클릭시 실행 함수
           onSelectEvent={handleSelectEvent}
           selectable
-          style={{ height: 400, width: "100%" }}
-          components={{ toolbar: MiniToolbar }}
+          style={{ height: 380, width: "100%" }}
+          components={{ toolbar: ToolbarMini }}
         />
       </div>
-      <div className="rightArticle">
+      <div className="middleArticle">
         <DragAndDropCalendar
           localizer={momentLocalizer(moment)}
           //가져올 이벤트 값
@@ -299,12 +322,24 @@ const BigCalendarInfo = () => {
           //새로운 이벤트 생성 함수
           onSelectSlot={newEvent}
           //이벤트 클릭시 실행 함수
-          onSelectEvent={handleSelectEvent}
+          onSelectEvent={openSideMenu}
           resizable
           selectable
           style={{ height: "100vh", width: "100%" }}
           components={{ toolbar: Toolbar }}
         />
+      </div>
+      <div
+        className="rightArticle"
+        style={{ transform: `translateX(${onSideDate}px)` }}
+      >
+        <SideUpdatePage
+          onData={onClickEventData}
+          onClose={openSideMenu}
+          onFormatChange={formatToOracleDate}
+          refetchOnLoadData={refetchOnLoadData}
+        />
+        /
       </div>
     </Container>
   );

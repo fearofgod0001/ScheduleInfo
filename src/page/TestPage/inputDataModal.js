@@ -1,14 +1,15 @@
 import React, { useState, useContext, useEffect } from "react";
 import { styled } from "styled-components";
-import { UserContext } from "../context/contextApi";
+import { UserContext } from "../../context/contextApi";
 import { useMutation } from "react-query";
-import { submit } from "../service/portal/calendar";
-import { useQuery } from "react-query";
-import { onLoadData } from "../service/portal/calendar";
+import { submit } from "../../service/portal/calendar";
 
 const Container = styled.div`
   position: absolute;
   z-index: 100;
+  top: 15rem;
+  left: 55rem;
+  transition: all 0.3s ease;
   .modal {
     width: 250px;
     height: 300px;
@@ -19,7 +20,7 @@ const Container = styled.div`
     background-color: white;
     border: 1px solid #ccc;
     border-radius: 4px;
-    animation: modal-bg-show 0.8s;
+
     .exitButton {
       position: absolute;
       top: -0.1rem;

@@ -8,7 +8,7 @@ export const onLoadData = async () => {
   });
 };
 
-export const submit = async (data) => {
+export const submitSchedule = async (data) => {
   return await callApi({
     url: "/api/v1/calendar/testinputdate",
     method: "POST",
@@ -16,9 +16,17 @@ export const submit = async (data) => {
   });
 };
 
-export const update = async (data) => {
+export const updateSchedule = async (data) => {
   return await callApi({
     url: "/api/v1/calendar/testupdatedate",
+    method: "POST",
+    data: { param: data },
+  });
+};
+
+export const deleteSchedule = async (data) => {
+  return await callApi({
+    url: "/api/v1/calendar/testdeletedate",
     method: "POST",
     data: { param: data },
   });
