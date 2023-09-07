@@ -224,7 +224,10 @@ const BigCalendarInfo = () => {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    const formattedDate = `${year}-${month}-${day}`;
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+    console.log("## format to DB DATE ==>", formattedDate);
     return formattedDate;
   };
   //보여줄 시간 양식을 재포맷
