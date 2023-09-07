@@ -250,9 +250,10 @@ const BigCalendarInfo = () => {
         console.log("##log event.start ==>", event.slots[0]);
         console.log("##log event.end ==>", event.slots[event.slots.length - 1]);
         setOnMakeNewEvent(event);
-        const idList = prev.map((item) => item.id);
-        const newId = Math.max(...idList) + 1;
-        return [...prev, { ...event, id: newId }];
+        // 새롭게 잡을 사이즈를 보여준다
+        // const idList = prev.map((item) => item.id);
+        // const newId = Math.max(...idList) + 1;
+        return [...prev];
       });
     },
     [setMyEvents]

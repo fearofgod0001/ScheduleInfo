@@ -32,16 +32,16 @@ const Container = styled.div`
     }
   }
   .buttonDesign {
-    width: 100px;
-    height: 40px;
+    width: 90px;
+    height: 30px;
     border-radius: 7px;
     border: none;
     font-size: 15px;
-    background-color: rgba(49, 116, 173);
-    color: white;
+    background-color: #ddd;
+    color: #a1a1a1;
     cursor: pointer;
     &:hover {
-      background-color: rgba(49, 116, 173, 0.8);
+      background-color: rgba(49, 116, 173);
       color: white;
     }
   }
