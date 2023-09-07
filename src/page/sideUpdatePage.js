@@ -37,7 +37,7 @@ const Container = styled.div`
     border-radius: 7px;
     border: none;
     font-size: 15px;
-    background-color: #ddd;
+    background-color: #e1e1e1;
     color: #a1a1a1;
     cursor: pointer;
     &:hover {
@@ -49,8 +49,13 @@ const Container = styled.div`
     width: 80%;
     height: 60%;
     .scheduleInfoHead {
-      font-size: 35px;
+      width: 100;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      font-size: 34px;
       margin-top: 10px;
+      padding-left: 10px;
       background-color: rgba(49, 116, 173);
       color: white;
       border-radius: 10px;
