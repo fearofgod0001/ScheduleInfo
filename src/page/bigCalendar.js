@@ -159,12 +159,11 @@ const BigCalendarInfo = () => {
   //쿼리가 발생하면 데이터를 받아서 이벤트를 가져온다.
   useEffect(() => {
     if (dataOnLoadData) {
-      // const adjEvents = Object.values(dataOnLoadData).map((data, ind) => ({
-      //   ...data,
-      //   start: formatToJSDate(data.start),
-      //   // end: formatToJSDate(data.end),
-      // }));
-      setMyEvents(Object.values(dataOnLoadData));
+      const adjEvents = Object.values(dataOnLoadData).map((data, ind) => ({
+        ...data,
+        start: formatToJSDate(data.start),
+      }));
+      setMyEvents(adjEvents);
     }
   }, [dataOnLoadData]);
 
