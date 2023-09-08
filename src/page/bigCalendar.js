@@ -14,6 +14,7 @@ import { useMutation } from "react-query";
 import { onLoadData } from "../service/portal/calendar";
 import { submitSchedule } from "../service/portal/calendar";
 import { updateSchedule } from "../service/portal/calendar";
+import events from "./events";
 
 const Container = styled.div`
   display: flex;
@@ -131,10 +132,10 @@ const Container = styled.div`
     }
   }
 `;
-const DragAndDropCalendar = withDragAndDrop(Calendar);
+
 const BigCalendarInfo = () => {
   //캘린더를 DragAndDrop으로 바꿉니다.
-
+  const DragAndDropCalendar = withDragAndDrop(Calendar);
   //유즈쿼리로 데이터를 받아옵니다.
   const { data: dataOnLoadData, refetch: refetchOnLoadData } = useQuery(
     "onLoadData",
@@ -143,6 +144,7 @@ const BigCalendarInfo = () => {
 
   //오라클 에서 들어오는 DATE 값을 JAVASCRIPT양식으로 바꿔주는 함수
   function formatToJSDate(oracleDateStr) {
+    console.log(oracleDateStr);
     return new Date(oracleDateStr);
   }
   //가져올 이벤트를 넣을 useState.
@@ -157,15 +159,10 @@ const BigCalendarInfo = () => {
   //쿼리가 발생하면 데이터를 받아서 이벤트를 가져온다.
   useEffect(() => {
     if (dataOnLoadData) {
-      //문제가 발생함 해당 adjEvents로 하면 1일짜리 event가 이동시 2일로바뀜
-      // //여기서 isDraggled를 선언한다. 기본값은 false다. 아무값도 넣지 않는다면 true
-      // //isDraggable: ind % 2 === 0 순서 나누기 2 즉 홀수 인 인자들만 움직일 수 있다.
       // const adjEvents = Object.values(dataOnLoadData).map((data, ind) => ({
       //   ...data,
       //   start: formatToJSDate(data.start),
-      //   end: formatToJSDate(data.end),
-      //   // isDraggable: ind % 2 === 0,
-      //   // isDraggable: true,
+      //   // end: formatToJSDate(data.end),
       // }));
       setMyEvents(Object.values(dataOnLoadData));
     }
@@ -201,7 +198,7 @@ const BigCalendarInfo = () => {
         mutateUpdate({
           id: existing.id,
           start: formatToOracleDate(start),
-          end: formatToOracleDate(end),
+          end: formatToOracleDate(end, "end"),
         });
         return [...filtered, { ...existing, start, end, allDay }];
       });
@@ -210,29 +207,23 @@ const BigCalendarInfo = () => {
   );
 
   //새로운 값을 입력할 유즈쿼리문
-  const {
-    data: dataSubmit,
-    mutate: mutateSubmit,
-    isSuccess: isSuccessSubmit,
-  } = useMutation("submitSchedule", submitSchedule);
+  const { data: dataSubmit, isSuccess: isSuccessSubmit } = useMutation(
+    "submitSchedule",
+    submitSchedule
+  );
 
   //DB에 넣을 시간양식 재포맷
-  const formatToOracleDate = (jsDateStr) => {
-    // console.log(jsDateStr);
+  const formatToOracleDate = (jsDateStr, end) => {
     const date = new Date(jsDateStr);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    // const hours = date.getHours();
-    // const minutes = date.getMinutes();
-    // const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
     const formattedDate = `${year}-${month}-${day}`;
-    // console.log("## format to DB DATE ==>", formattedDate);
     return formattedDate;
   };
+
   //보여줄 시간 양식을 재포맷
   const formatToShowDate = (jsDateStr) => {
-    // console.log(jsDateStr);
     const date = new Date(jsDateStr);
     const month = date.getMonth() + 1;
     const day = date.getDate();
@@ -253,9 +244,6 @@ const BigCalendarInfo = () => {
         console.log("##log event.start ==>", event.slots[0]);
         console.log("##log event.end ==>", event.slots[event.slots.length - 1]);
         setOnMakeNewEvent(event);
-        // 새롭게 잡을 사이즈를 보여준다
-        // const idList = prev.map((item) => item.id);
-        // const newId = Math.max(...idList) + 1;
         return [...prev];
       });
     },
