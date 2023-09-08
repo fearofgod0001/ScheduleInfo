@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import { styled } from "styled-components";
 import { Calendar } from "antd";
-import { UserContext } from "../context/contextApi";
-import InputDataModal from "./TestPage/inputDataModal";
+import { UserContext } from "../../context/contextApi";
+import InputDataModal from "./inputDataModal";
 import locale from "antd/es/calendar/locale/ko_KR";
 import { useQuery } from "react-query";
-import { onLoadData } from "../service/portal/calendar";
-import useCalendarData from "../common/hooks/useCalendar";
-import { calendarData } from "../recoil/atom/calendarData";
+import { onLoadData } from "../../service/portal/calendar";
+import useCalendarData from "../../common/hooks/useCalendar";
+import { calendarData } from "../../recoil/atom/calendarData";
 
 const Container = styled.div`
   width: 100%;

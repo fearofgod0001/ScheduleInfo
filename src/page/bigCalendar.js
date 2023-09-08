@@ -6,6 +6,7 @@ import ToolbarMini from "./toolbarMini";
 import InputDateModal from "./inputDateModal";
 import SideUpdatePage from "./sideUpdatePage";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { styled } from "styled-components";
 import { useQuery } from "react-query";
@@ -130,10 +131,9 @@ const Container = styled.div`
     }
   }
 `;
-
+const DragAndDropCalendar = withDragAndDrop(Calendar);
 const BigCalendarInfo = () => {
   //캘린더를 DragAndDrop으로 바꿉니다.
-  const DragAndDropCalendar = withDragAndDrop(Calendar);
 
   //유즈쿼리로 데이터를 받아옵니다.
   const { data: dataOnLoadData, refetch: refetchOnLoadData } = useQuery(
@@ -157,16 +157,17 @@ const BigCalendarInfo = () => {
   //쿼리가 발생하면 데이터를 받아서 이벤트를 가져온다.
   useEffect(() => {
     if (dataOnLoadData) {
-      //여기서 isDraggled를 선언한다. 기본값은 false다. 아무값도 넣지 않는다면 true
-      //isDraggable: ind % 2 === 0 순서 나누기 2 즉 홀수 인 인자들만 움직일 수 있다.
-      const adjEvents = Object.values(dataOnLoadData).map((data, ind) => ({
-        ...data,
-        start: formatToJSDate(data.start),
-        end: formatToJSDate(data.end),
-        // isDraggable: ind % 2 === 0,
-        // isDraggable: true,
-      }));
-      setMyEvents(adjEvents);
+      //문제가 발생함 해당 adjEvents로 하면 1일짜리 event가 이동시 2일로바뀜
+      // //여기서 isDraggled를 선언한다. 기본값은 false다. 아무값도 넣지 않는다면 true
+      // //isDraggable: ind % 2 === 0 순서 나누기 2 즉 홀수 인 인자들만 움직일 수 있다.
+      // const adjEvents = Object.values(dataOnLoadData).map((data, ind) => ({
+      //   ...data,
+      //   start: formatToJSDate(data.start),
+      //   end: formatToJSDate(data.end),
+      //   // isDraggable: ind % 2 === 0,
+      //   // isDraggable: true,
+      // }));
+      setMyEvents(Object.values(dataOnLoadData));
     }
   }, [dataOnLoadData]);
 
@@ -195,7 +196,6 @@ const BigCalendarInfo = () => {
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
         const filtered = prev.filter((ev) => ev.id !== event.id);
-        console.debug("## find existing==> ", existing.id);
         console.debug("## find start==> ", start);
         console.debug("## find end==> ", end);
         mutateUpdate({
@@ -203,7 +203,6 @@ const BigCalendarInfo = () => {
           start: formatToOracleDate(start),
           end: formatToOracleDate(end),
         });
-
         return [...filtered, { ...existing, start, end, allDay }];
       });
     },
@@ -219,20 +218,21 @@ const BigCalendarInfo = () => {
 
   //DB에 넣을 시간양식 재포맷
   const formatToOracleDate = (jsDateStr) => {
-    console.log(jsDateStr);
+    // console.log(jsDateStr);
     const date = new Date(jsDateStr);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
-    console.log("## format to DB DATE ==>", formattedDate);
+    // const hours = date.getHours();
+    // const minutes = date.getMinutes();
+    // const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+    const formattedDate = `${year}-${month}-${day}`;
+    // console.log("## format to DB DATE ==>", formattedDate);
     return formattedDate;
   };
   //보여줄 시간 양식을 재포맷
   const formatToShowDate = (jsDateStr) => {
-    console.log(jsDateStr);
+    // console.log(jsDateStr);
     const date = new Date(jsDateStr);
     const month = date.getMonth() + 1;
     const day = date.getDate();
@@ -275,6 +275,8 @@ const BigCalendarInfo = () => {
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
         const filtered = prev.filter((ev) => ev.id !== event.id);
+        console.debug("## find start==> ", start);
+        console.debug("## find end==> ", end);
         mutateUpdate({
           id: existing.id,
           start: formatToOracleDate(start),

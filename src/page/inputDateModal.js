@@ -135,7 +135,7 @@ const InputDateModal = (props) => {
     onFormatChange,
     formatToShowDate,
   } = props;
-  console.log(newEventData);
+  //   console.log(newEventData);
   //미니 캘린더의 크기를 조절할 스테이트
   const [onCalendar, setOnCalendar] = useState(0);
   const onOpenCalendar = () => {
