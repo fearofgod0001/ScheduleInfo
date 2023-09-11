@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Calendar, Views, momentLocalizer } from "react-big-calendar";
+import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import Toolbar from "./toolbar";
 import ToolbarMini from "./toolbarMini";
@@ -247,10 +247,6 @@ const BigCalendarInfo = () => {
     const day = date.getDate();
     const weekday = date.getDay();
     const week = ["일", "월", "화", "수", "목", "금", "토"];
-    if (end && date > startDate) {
-      const formattedDate = `${month}월 ${day - 1}일 (${week[weekday]}요일)`;
-      return formattedDate;
-    }
     const formattedDate = `${month}월 ${day}일 (${week[weekday]}요일)`;
     return formattedDate;
   };
