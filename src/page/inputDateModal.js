@@ -191,7 +191,7 @@ const InputDateModal = (props) => {
           type="text"
           className="inputTitle"
           placeholder="제목을 입력하세요"
-          value={eventTitle}
+          value={eventTitle || ""}
           onChange={onEventTitle}
         ></input>
         <div className="changeDate">

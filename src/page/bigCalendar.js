@@ -144,7 +144,6 @@ const BigCalendarInfo = () => {
 
   //오라클 에서 들어오는 DATE 값을 JAVASCRIPT양식으로 바꿔주는 함수
   function formatToJSDate(oracleDateStr) {
-    console.log(oracleDateStr);
     return new Date(oracleDateStr);
   }
   //가져올 이벤트를 넣을 useState.
@@ -177,7 +176,6 @@ const BigCalendarInfo = () => {
   //데이터 수정ㅇ 완료되면 리패치를 하여 재랜더링 되게 한다.
   useEffect(() => {
     if (isSuccessUpdate && dataUpdate) {
-      console.debug("## submit refetch => ", dataUpdate);
       refetchOnLoadData();
     }
   }, [isSuccessUpdate, dataUpdate, refetchOnLoadData]);
@@ -192,12 +190,10 @@ const BigCalendarInfo = () => {
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
         const filtered = prev.filter((ev) => ev.id !== event.id);
-        console.debug("## find start==> ", start);
-        console.debug("## find end==> ", end);
         mutateUpdate({
           id: existing.id,
           start: formatToOracleDate(start),
-          end: formatToOracleDate(end, "end"),
+          end: formatToOracleDate(end),
         });
         return [...filtered, { ...existing, start, end, allDay }];
       });
@@ -212,7 +208,7 @@ const BigCalendarInfo = () => {
   );
 
   //DB에 넣을 시간양식 재포맷
-  const formatToOracleDate = (jsDateStr, end) => {
+  const formatToOracleDate = (jsDateStr) => {
     const date = new Date(jsDateStr);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -222,12 +218,16 @@ const BigCalendarInfo = () => {
   };
 
   //보여줄 시간 양식을 재포맷
-  const formatToShowDate = (jsDateStr) => {
+  const formatToShowDate = (jsDateStr, startDate, end) => {
     const date = new Date(jsDateStr);
     const month = date.getMonth() + 1;
     const day = date.getDate();
     const weekday = date.getDay();
     const week = ["일", "월", "화", "수", "목", "금", "토"];
+    if (end && date > startDate) {
+      const formattedDate = `${month}월 ${day - 1}일 (${week[weekday]}요일)`;
+      return formattedDate;
+    }
     const formattedDate = `${month}월 ${day}일 (${week[weekday]}요일)`;
     return formattedDate;
   };
@@ -238,10 +238,6 @@ const BigCalendarInfo = () => {
     (event, start, end) => {
       setMyEvents((prev) => {
         setOnModal(500);
-        console.log("##log prev ==>", prev);
-        console.log("##log event ==>", event);
-        console.log("##log event.start ==>", event.slots[0]);
-        console.log("##log event.end ==>", event.slots[event.slots.length - 1]);
         setOnMakeNewEvent(event);
         return [...prev];
       });
