@@ -5,6 +5,7 @@ import Toolbar from "./toolbar";
 import ToolbarMini from "./toolbarMini";
 import InputDateModal from "./inputDateModal";
 import SideUpdatePage from "./sideUpdatePage";
+import SideOtherCalPage from "./sideOtherCalPage";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
@@ -19,10 +20,24 @@ import events from "./events";
 const Container = styled.div`
   display: flex;
   overflow: hidden;
+
   .leftArticle {
-    width: 20%;
-    height: 100%;
-    background-color: #f1f1f1;
+    min-width: 330px;
+    height: 100vh;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+    .calManagement {
+      width: 90%;
+      height: 57%;
+    }
+    .rbc-month-view {
+      border: none;
+      .rbc-date-cell {
+        text-align: center;
+      }
+    }
   }
   .middleArticle {
     width: 80%;
@@ -165,6 +180,7 @@ const BigCalendarInfo = () => {
       const adjEvents = Object.values(dataOnLoadData).map((data, ind) => ({
         ...data,
         start: formatToJSDate(data.start),
+        end: formatToJSDate(data.end),
       }));
       setMyEvents(adjEvents);
     }
@@ -217,7 +233,10 @@ const BigCalendarInfo = () => {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    const formattedDate = `${year}-${month}-${day}`;
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+    const formattedDate = `${year}-${month}-${day} ${hour}:${minutes}`;
+    console.log(formattedDate);
     return formattedDate;
   };
 
@@ -284,16 +303,13 @@ const BigCalendarInfo = () => {
     else setOnSideDate(0);
     setOnClickEventData(event);
   };
-  //이름 클릭했을 때 나오는 얼럿 title id allDay Start 등을 볼 수 있다.
-  const handleSelectEvent = useCallback(
-    (event) =>
-      window.alert(`Title: ${event.title}\nMemo: ${event.meno}\n일정입니다.`),
-    []
-  );
+  //클릭한 날짜의 정보를 받아옴
   const [handleDate, setHandleDate] = useState();
   const handleDateChange = (date) => {
+    console.log(date);
     setHandleDate(date);
   };
+  //클릭한 view의 정보를 받아옴
   const [currentView, setCurrentView] = useState();
   const handleViewChange = (newView) => {
     setCurrentView(newView);
@@ -313,7 +329,7 @@ const BigCalendarInfo = () => {
       <div className="leftArticle">
         <Calendar
           localizer={localizer}
-          style={{ height: 350, width: "100%" }}
+          style={{ height: 350, width: "90%" }}
           components={{ toolbar: ToolbarMini }}
           view="month"
           //클릭한 date날짜를 가져옴
@@ -321,6 +337,10 @@ const BigCalendarInfo = () => {
           //클릭 한 view 의 유형을 가져옴
           onView={handleViewChange}
         />
+        <div className="calManagement">
+          <div className="myCalendar"></div>
+          <SideOtherCalPage />
+        </div>
       </div>
       <div className="middleArticle">
         <DragAndDropCalendar

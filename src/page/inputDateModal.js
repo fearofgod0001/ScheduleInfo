@@ -179,6 +179,13 @@ const InputDateModal = (props) => {
     }
   }, [isSuccessSubmit, dataSubmit, refetchOnLoadData]);
 
+  const [handleDate, setHandleDate] = useState();
+  const handleDateChange = (date) => {
+    console.log(formatToShowDate(date));
+    setHandleDate(formatToShowDate(date));
+    onOpenCalendar(0);
+  };
+
   return (
     <InputModalContainer style={{ height: open }}>
       <div className="inputModalHead">
@@ -208,9 +215,10 @@ const InputDateModal = (props) => {
         <div className="inputCalendar" style={{ height: onCalendar }}>
           <Calendar
             localizer={momentLocalizer(moment)}
-            //가져올 이벤트 값
             events={events}
+            onNavigate={handleDateChange}
             selectable
+            view="month"
             style={{
               backgroundColor: "white",
               height: 230,
