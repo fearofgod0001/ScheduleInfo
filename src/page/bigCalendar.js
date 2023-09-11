@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import { Calendar, Views, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import Toolbar from "./toolbar";
 import ToolbarMini from "./toolbarMini";
@@ -136,6 +136,10 @@ const Container = styled.div`
 const BigCalendarInfo = () => {
   //캘린더를 DragAndDrop으로 바꿉니다.
   const DragAndDropCalendar = withDragAndDrop(Calendar);
+
+  moment.locale("ko-KR");
+  const localizer = momentLocalizer(moment);
+
   //유즈쿼리로 데이터를 받아옵니다.
   const { data: dataOnLoadData, refetch: refetchOnLoadData } = useQuery(
     "onLoadData",
@@ -286,6 +290,14 @@ const BigCalendarInfo = () => {
       window.alert(`Title: ${event.title}\nMemo: ${event.meno}\n일정입니다.`),
     []
   );
+  const [handleDate, setHandleDate] = useState();
+  const handleDateChange = (date) => {
+    setHandleDate(date);
+  };
+  const [currentView, setCurrentView] = useState();
+  const handleViewChange = (newView) => {
+    setCurrentView(newView);
+  };
 
   return (
     <Container>
@@ -300,30 +312,37 @@ const BigCalendarInfo = () => {
       />
       <div className="leftArticle">
         <Calendar
-          localizer={momentLocalizer(moment)}
-          //가져올 이벤트 값
-          events={myEvents}
-          //이벤트 클릭시 실행 함수
-          onSelectEvent={handleSelectEvent}
-          selectable
-          style={{ height: 380, width: "100%" }}
+          localizer={localizer}
+          style={{ height: 350, width: "100%" }}
           components={{ toolbar: ToolbarMini }}
+          view="month"
+          //클릭한 date날짜를 가져옴
+          onNavigate={handleDateChange}
+          //클릭 한 view 의 유형을 가져옴
+          onView={handleViewChange}
         />
       </div>
       <div className="middleArticle">
         <DragAndDropCalendar
-          localizer={momentLocalizer(moment)}
+          localizer={localizer}
           //가져올 이벤트 값
           events={myEvents}
           //위치 재정의
           onEventDrop={moveEvent}
           //사이즈 재정의
           onEventResize={resizeEvent}
-          // draggableAccessor="isDraggable"
           //새로운 이벤트 생성 함수
           onSelectSlot={newEvent}
           //이벤트 클릭시 실행 함수
           onSelectEvent={openSideMenu}
+          // onNavigate 에서 가져온 값으로 현재 날짜를 바꿈
+          date={handleDate}
+          //이번달 이전 다음 에서 가져올 값들
+          onNavigate={handleDateChange}
+          // view를 바꿀 함수 toolbar에 있는 모든 값을 받을 수 있다.
+          onView={handleViewChange}
+          //보여질 화면
+          view={currentView}
           resizable
           selectable
           style={{ height: "100vh", width: "100%" }}

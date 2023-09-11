@@ -8,9 +8,13 @@ export default function Toolbar(props) {
   const onViews = (action) => {
     props.onView(action);
   };
+  const week = ["일", "월", "화", "수", "목", "금", "토"];
 
   return (
-    <div className="rbc-toolbar">
+    <div
+      className="rbc-toolbar"
+      style={{ display: "flex", justifyContent: "space-evenly" }}
+    >
       <span className="rbc-btn-group">
         <button type="button" onClick={navigate.bind(null, "TODAY")}>
           이번달
@@ -21,11 +25,17 @@ export default function Toolbar(props) {
         <button type="button" onClick={navigate.bind(null, "NEXT")}>
           다음
         </button>
-        <span className="rbc-toolbar-label">{`${date.getFullYear()}년 ${
-          date.getMonth() + 1
-        }월`}</span>
       </span>
-
+      <span className="rbc-toolbar-label">
+        {props.view === "month" &&
+          `${date.getFullYear()}년 ${date.getMonth() + 1}월`}
+        {props.view === "week" &&
+          `${date.getFullYear()}년 ${date.getMonth() + 1}월`}
+        {props.view === "day" &&
+          `${date.getMonth() + 1}월 ${date.getDate()}일 ${
+            week[date.getDay()]
+          }요일`}
+      </span>
       <span className="rbc-btn-group">
         <button type="button" onClick={onViews.bind(null, "month")}>
           월
