@@ -145,9 +145,11 @@ const InputDateModal = (props) => {
 
   const [eventTitle, setEventTitle] = useState();
   const [eventMemo, setEventMemo] = useState();
+  //제목을 입력
   const onEventTitle = (e) => {
     setEventTitle(e.target.value);
   };
+  //메모를 입력
   const onEventMemo = (e) => {
     setEventMemo(e.target.value);
   };
@@ -162,6 +164,7 @@ const InputDateModal = (props) => {
   const [onAllDay, setOnAllDay] = useState();
   const [onEndDay, setEndDay] = useState();
 
+  //월과 달을 받아서 하루 종일인 event가 맞으면 23시간 59분을 더해서 1일 더 추가로 보여지게한다
   useEffect(() => {
     if (newEventData) {
       const startDate = newEventData.slots[0];
@@ -185,6 +188,7 @@ const InputDateModal = (props) => {
     }
   }, [newEventData]);
 
+  //event를 db에 넣어줄 mutation
   const onSubmitEventData = () => {
     mutateSubmit({
       title: eventTitle,
@@ -205,13 +209,6 @@ const InputDateModal = (props) => {
       setEventMemo("");
     }
   }, [isSuccessSubmit, dataSubmit, refetchOnLoadData]);
-
-  const [handleDate, setHandleDate] = useState();
-  const handleDateChange = (date) => {
-    console.log(formatToShowDate(date));
-    setHandleDate(formatToShowDate(date));
-    onOpenCalendar(0);
-  };
 
   return (
     <InputModalContainer style={{ height: open }}>
@@ -243,7 +240,6 @@ const InputDateModal = (props) => {
           <Calendar
             localizer={momentLocalizer(moment)}
             events={events}
-            onNavigate={handleDateChange}
             selectable
             // view="month"
             style={{

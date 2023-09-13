@@ -40,15 +40,20 @@ const Container = styled.div`
       background-color: white;
     }
     .rbc-month-row {
+      border: none;
       .rbc-row-bg {
         height: 44px;
       }
     }
+
+    .rbc-day-bg {
+      border: none;
+    }
     .rbc-date-cell.rbc-now,
     .rbc-date-cell.rbc-date-cell.rbc-now.rbc-current {
       .rbc-button-link {
-        width: 20px;
-        height: 20px;
+        width: 25px;
+        height: 25px;
         border-radius: 50%;
         background-color: rgba(49, 116, 173);
         color: white;
@@ -56,8 +61,8 @@ const Container = styled.div`
     }
     .rbc-date-cell.rbc-current {
       .rbc-button-link {
-        width: 20px;
-        height: 20px;
+        width: 25px;
+        height: 25px;
         border-radius: 50%;
         background-color: rgba(49, 116, 173, 0.5);
         color: white;
