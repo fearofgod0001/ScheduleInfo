@@ -15,12 +15,12 @@ import { useMutation } from "react-query";
 import { onLoadData } from "../service/portal/calendar";
 import { submitSchedule } from "../service/portal/calendar";
 import { updateSchedule } from "../service/portal/calendar";
-import events from "./events";
-
 const Container = styled.div`
   display: flex;
   overflow: hidden;
-
+  .rbc-date-cell {
+    text-align: center;
+  }
   .leftArticle {
     min-width: 330px;
     height: 100vh;
@@ -33,15 +33,71 @@ const Container = styled.div`
       height: 57%;
     }
     .rbc-month-view {
+      height: 100px;
       border: none;
-      .rbc-date-cell {
-        text-align: center;
+    }
+    .rbc-day-bg.rbc-today {
+      background-color: white;
+    }
+    .rbc-month-row {
+      .rbc-row-bg {
+        height: 44px;
+      }
+    }
+    .rbc-date-cell.rbc-now,
+    .rbc-date-cell.rbc-date-cell.rbc-now.rbc-current {
+      .rbc-button-link {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: rgba(49, 116, 173);
+        color: white;
+      }
+    }
+    .rbc-date-cell.rbc-current {
+      .rbc-button-link {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: rgba(49, 116, 173, 0.5);
+        color: white;
       }
     }
   }
   .middleArticle {
     width: 80%;
     height: 100%;
+
+    .rbc-row.rbc-month-header {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      .rbc-header {
+        border-bottom: none;
+      }
+    }
+    .rbc-day-bg.rbc-today {
+      background-color: white;
+    }
+    .rbc-date-cell {
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: end;
+    }
+    .rbc-event.rbc-event-allday {
+      width: 100%;
+    }
+    .rbc-date-cell.rbc-now {
+      .rbc-button-link {
+        width: 25px;
+        height: 25px;
+        box-shadow: 0 0 5px #aaa;
+        border-radius: 50%;
+        background-color: rgba(49, 116, 173);
+        color: white;
+      }
+    }
   }
   .rightArticle {
     position: fixed;
@@ -55,6 +111,7 @@ const Container = styled.div`
   .rbc-addons-dnd {
     .rbc-addons-dnd-row-body {
       position: relative;
+      margin-top: 10px;
     }
     .rbc-addons-dnd-drag-row {
       position: absolute;
@@ -64,7 +121,7 @@ const Container = styled.div`
     }
     .rbc-day-bg {
       &:hover {
-        background-color: #ccc;
+        background-color: #eee;
       }
     }
     .rbc-addons-dnd-over {
@@ -78,7 +135,7 @@ const Container = styled.div`
 
     .rbc-event {
       transition: opacity 150ms;
-
+      width: 100%;
       &:hover {
         .rbc-addons-dnd-resize-ns-icon,
         .rbc-addons-dnd-resize-ew-icon {
@@ -165,8 +222,9 @@ const BigCalendarInfo = () => {
   function formatToJSDate(oracleDateStr) {
     return new Date(oracleDateStr);
   }
+
   //가져올 이벤트를 넣을 useState.
-  const [myEvents, setMyEvents] = useState([]);
+  const [myEvents, setMyEvents] = useState();
   //모달창을 띄울 useState
   const [onModal, setOnModal] = useState(0);
   //모달을 닫을 함수
@@ -177,7 +235,7 @@ const BigCalendarInfo = () => {
   //쿼리가 발생하면 데이터를 받아서 이벤트를 가져온다.
   useEffect(() => {
     if (dataOnLoadData) {
-      const adjEvents = Object.values(dataOnLoadData).map((data, ind) => ({
+      const adjEvents = Object.values(dataOnLoadData).map((data) => ({
         ...data,
         start: formatToJSDate(data.start),
         end: formatToJSDate(data.end),
@@ -193,7 +251,7 @@ const BigCalendarInfo = () => {
     isSuccess: isSuccessUpdate,
   } = useMutation("updateSchedule", updateSchedule);
 
-  //데이터 수정ㅇ 완료되면 리패치를 하여 재랜더링 되게 한다.
+  //데이터 수정이 완료되면 리패치를 하여 재랜더링 되게 한다.
   useEffect(() => {
     if (isSuccessUpdate && dataUpdate) {
       refetchOnLoadData();
@@ -202,20 +260,18 @@ const BigCalendarInfo = () => {
 
   //이벤트 이동 기능
   const moveEvent = useCallback(
-    ({ event, start, end, isAllDay: droppedOnAllDaySlot = false }) => {
-      const { allDay } = event;
-      if (!allDay && droppedOnAllDaySlot) {
-        event.allDay = true;
-      }
+    ({ event, start, end }) => {
+      console.log(event);
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
         const filtered = prev.filter((ev) => ev.id !== event.id);
         mutateUpdate({
           id: existing.id,
+          allday: event.allday,
           start: formatToOracleDate(start),
-          end: formatToOracleDate(end),
+          end: formatToOracleDate(event.allday === "0" ? start : end),
         });
-        return [...filtered, { ...existing, start, end, allDay }];
+        return [...filtered, { ...existing, start, end }];
       });
     },
     [setMyEvents]
@@ -229,6 +285,7 @@ const BigCalendarInfo = () => {
 
   //DB에 넣을 시간양식 재포맷
   const formatToOracleDate = (jsDateStr) => {
+    console.log(jsDateStr);
     const date = new Date(jsDateStr);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -241,7 +298,7 @@ const BigCalendarInfo = () => {
   };
 
   //보여줄 시간 양식을 재포맷
-  const formatToShowDate = (jsDateStr, startDate, end) => {
+  const formatToShowDate = (jsDateStr) => {
     const date = new Date(jsDateStr);
     const month = date.getMonth() + 1;
     const day = date.getDate();
@@ -254,15 +311,18 @@ const BigCalendarInfo = () => {
   const [onMakeNewEvent, setOnMakeNewEvent] = useState();
   //새로운 이벤트 입력 기능
   const newEvent = useCallback(
-    (event, start, end) => {
+    (event) => {
       setMyEvents((prev) => {
         setOnModal(500);
         setOnMakeNewEvent(event);
-        return [...prev];
+        const idList = prev.map((item) => item.id);
+        const newId = Math.max(...idList) + 1;
+        return [...prev, { ...event, id: newId }];
       });
     },
     [setMyEvents]
   );
+
   //데이터 입력이 완료되면 리패치를 하여 재랜더링 되게 한다.
   useEffect(() => {
     if (isSuccessSubmit && dataSubmit) {
@@ -277,10 +337,9 @@ const BigCalendarInfo = () => {
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
         const filtered = prev.filter((ev) => ev.id !== event.id);
-        console.debug("## find start==> ", start);
-        console.debug("## find end==> ", end);
         mutateUpdate({
           id: existing.id,
+          allday: event.all,
           start: formatToOracleDate(start),
           end: formatToOracleDate(end),
         });
@@ -293,12 +352,14 @@ const BigCalendarInfo = () => {
   const [onSideDate, setOnSideDate] = useState(420);
   const [onEventId, setOnEventId] = useState();
   const [onClickEventData, setOnClickEventData] = useState();
+  //사이드 메뉴를 열고 닫음
   const openSideMenu = (event) => {
     setOnEventId(event.id);
     if (onSideDate === 0 && event.id === onEventId) setOnSideDate(420);
     else setOnSideDate(0);
     setOnClickEventData(event);
   };
+
   //클릭한 날짜의 정보를 받아옴
   const [handleDate, setHandleDate] = useState();
   const handleDateChange = (date) => {
@@ -310,6 +371,16 @@ const BigCalendarInfo = () => {
   const handleViewChange = (newView) => {
     setCurrentView(newView);
   };
+
+  //user id값을 받아와서 다른 캘린더의 정보를 받아올 때 컬러를 변경하도록한다.
+  const eventPropGetter = useCallback(
+    (event) => ({
+      ...(event.id === 324
+        ? { style: { backgroundColor: "#CCC" } }
+        : { style: {} }),
+    }),
+    []
+  );
 
   return (
     <Container>
@@ -325,7 +396,7 @@ const BigCalendarInfo = () => {
       <div className="leftArticle">
         <Calendar
           localizer={localizer}
-          style={{ height: 350, width: "90%" }}
+          style={{ width: "90%", height: 280 }}
           components={{ toolbar: ToolbarMini }}
           view="month"
           //클릭한 date날짜를 가져옴
@@ -333,10 +404,6 @@ const BigCalendarInfo = () => {
           //클릭 한 view 의 유형을 가져옴
           onView={handleViewChange}
         />
-        <div className="calManagement">
-          <div className="myCalendar"></div>
-          <SideOtherCalPage />
-        </div>
       </div>
       <div className="middleArticle">
         <DragAndDropCalendar
@@ -359,6 +426,8 @@ const BigCalendarInfo = () => {
           onView={handleViewChange}
           //보여질 화면
           view={currentView}
+          //이벤트 발생할 때마다
+          eventPropGetter={eventPropGetter}
           resizable
           selectable
           style={{ height: "100vh", width: "100%" }}

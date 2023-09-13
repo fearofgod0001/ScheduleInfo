@@ -159,11 +159,38 @@ const InputDateModal = (props) => {
     isSuccess: isSuccessSubmit,
   } = useMutation("submitSchedule", submitSchedule);
 
+  const [onAllDay, setOnAllDay] = useState();
+  const [onEndDay, setEndDay] = useState();
+
+  useEffect(() => {
+    if (newEventData) {
+      const startDate = newEventData.slots[0];
+      const endDate = newEventData.slots[newEventData.slots.length - 1];
+      if (
+        startDate.getMonth() === endDate.getMonth() &&
+        startDate.getDate() === endDate.getDate()
+      ) {
+        setOnAllDay(false);
+        setEndDay(newEventData.slots[newEventData.slots.length - 1]);
+      } else {
+        setOnAllDay(true);
+        setEndDay(
+          new Date(
+            newEventData.slots[newEventData.slots.length - 1].getTime() +
+              23 * 60 * 60 * 1000 +
+              59 * 60 * 1000
+          )
+        );
+      }
+    }
+  }, [newEventData]);
+
   const onSubmitEventData = () => {
     mutateSubmit({
       title: eventTitle,
       start: onFormatChange(newEventData.slots[0]),
-      end: onFormatChange(newEventData.slots[newEventData.slots.length - 1]),
+      end: onFormatChange(onEndDay),
+      allday: onAllDay,
       memo: eventMemo,
     });
   };
@@ -218,7 +245,7 @@ const InputDateModal = (props) => {
             events={events}
             onNavigate={handleDateChange}
             selectable
-            view="month"
+            // view="month"
             style={{
               backgroundColor: "white",
               height: 230,

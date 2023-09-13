@@ -105,8 +105,6 @@ const InputDatePage = (props) => {
   //데이터 수정이 완료되면 리패치를 하여 재랜더링 되게 한다.
   useEffect(() => {
     if (isSuccessDelete && dataDelete) {
-      console.debug("## submit refetch => ", dataDelete);
-      console.debug("## submit isSuccessDelete => ", isSuccessDelete);
       refetchOnLoadData();
     }
   }, [isSuccessDelete, dataDelete, refetchOnLoadData]);
@@ -137,7 +135,7 @@ const InputDatePage = (props) => {
           </div>
 
           <div className="scheduleInfoDate">
-            {onData && formatToShowDate(onData.end, onData.start, "end")}
+            {onData && formatToShowDate(onData.end)}
           </div>
         </div>
         <div className="todoMemo">{onData && onData.memo}</div>
