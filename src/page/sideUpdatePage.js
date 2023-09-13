@@ -135,7 +135,7 @@ const InputDatePage = (props) => {
           </div>
 
           <div className="scheduleInfoDate">
-            {onData && formatToShowDate(onData.end)}
+            {onData && formatToShowDate(onData.end, onData.allday)}
           </div>
         </div>
         <div className="todoMemo">{onData && onData.memo}</div>

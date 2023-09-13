@@ -274,7 +274,7 @@ const BigCalendarInfo = () => {
           id: existing.id,
           allday: event.allday,
           start: formatToOracleDate(start),
-          end: formatToOracleDate(event.allday === "0" ? start : end),
+          end: formatToOracleDate(end),
         });
         return [...filtered, { ...existing, start, end }];
       });
@@ -303,10 +303,11 @@ const BigCalendarInfo = () => {
   };
 
   //보여줄 시간 양식을 재포맷
-  const formatToShowDate = (jsDateStr) => {
+  const formatToShowDate = (jsDateStr, allday) => {
     const date = new Date(jsDateStr);
     const month = date.getMonth() + 1;
-    const day = date.getDate();
+    let day = "";
+    allday === 0 ? (day = date.getDate() - 1) : (day = date.getDate());
     const weekday = date.getDay();
     const week = ["일", "월", "화", "수", "목", "금", "토"];
     const formattedDate = `${month}월 ${day}일 (${week[weekday]}요일)`;
@@ -320,9 +321,7 @@ const BigCalendarInfo = () => {
       setMyEvents((prev) => {
         setOnModal(500);
         setOnMakeNewEvent(event);
-        const idList = prev.map((item) => item.id);
-        const newId = Math.max(...idList) + 1;
-        return [...prev, { ...event, id: newId }];
+        return [...prev];
       });
     },
     [setMyEvents]
@@ -344,7 +343,7 @@ const BigCalendarInfo = () => {
         const filtered = prev.filter((ev) => ev.id !== event.id);
         mutateUpdate({
           id: existing.id,
-          allday: event.all,
+          allday: event.allday,
           start: formatToOracleDate(start),
           end: formatToOracleDate(end),
         });
@@ -380,8 +379,8 @@ const BigCalendarInfo = () => {
   //user id값을 받아와서 다른 캘린더의 정보를 받아올 때 컬러를 변경하도록한다.
   const eventPropGetter = useCallback(
     (event) => ({
-      ...(event.id === 324
-        ? { style: { backgroundColor: "#CCC" } }
+      ...(event.allday != "0"
+        ? { style: { backgroundColor: "#616264" } }
         : { style: {} }),
     }),
     []
