@@ -297,12 +297,13 @@ const BigCalendarInfo = () => {
     const hour = date.getHours();
     const minutes = date.getMinutes();
     const formattedDate = `${year}-${month}-${day} ${hour}:${minutes}`;
-
     return formattedDate;
   };
 
   //보여줄 시간 양식을 재포맷
   const formatToShowDate = (jsDateStr, allday) => {
+    console.log(jsDateStr);
+    console.log(allday);
     const date = new Date(jsDateStr);
     const month = date.getMonth() + 1;
     let day = "";
@@ -359,6 +360,7 @@ const BigCalendarInfo = () => {
   const [onClickEventData, setOnClickEventData] = useState();
   //사이드 메뉴를 열고 닫음
   const openSideMenu = (event) => {
+    console.log(event);
     setOnEventId(event.id);
     if (onSideDate === 0 && event.id === onEventId) setOnSideDate(420);
     else setOnSideDate(0);

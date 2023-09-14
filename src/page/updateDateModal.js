@@ -130,14 +130,12 @@ const UpdateDateModal = (props) => {
     refetchOnLoadData,
     onFormatChange,
     formatToShowDate,
+    setOnTitleMemo,
   } = props;
-  //   console.log(newEventData);
-  //미니 캘린더의 크기를 조절할 스테이트
 
   useEffect(() => {
     events && setEventTitle(events.title);
     events && setEventMemo(events.memo);
-    console.log(events);
   }, [events]);
 
   const [eventTitle, setEventTitle] = useState();
@@ -162,6 +160,8 @@ const UpdateDateModal = (props) => {
   useEffect(() => {
     if (isSuccessUpdate && dataUpdate) {
       refetchOnLoadData();
+      //부모 페이지로 보낼 새로운 업데이트 데이터
+      setOnTitleMemo(dataUpdate.param);
       close();
     }
   }, [isSuccessUpdate, dataUpdate, refetchOnLoadData]);

@@ -133,6 +133,11 @@ const InputDatePage = (props) => {
     setOnModal(500);
   };
 
+  const [onTitleMemo, setOnTitleMemo] = useState();
+  useEffect(() => {
+    setOnTitleMemo(onData);
+  }, [onData]);
+
   return (
     <Container>
       <UpdateDateModal
@@ -142,6 +147,7 @@ const InputDatePage = (props) => {
         refetchOnLoadData={refetchOnLoadData}
         onFormatChange={onFormatChange}
         formatToShowDate={formatToShowDate}
+        setOnTitleMemo={setOnTitleMemo}
       />
       <div className="topButton">
         <button className="closeButton" onClick={onCloseSidePage}>
@@ -149,17 +155,20 @@ const InputDatePage = (props) => {
         </button>
       </div>
       <div className="scheduleInfo">
-        <div className="scheduleInfoHead">{onData && onData.title}</div>
+        <div className="scheduleInfoHead">
+          {onTitleMemo && onTitleMemo.title}
+        </div>
         <div className="scheduleDate">
           <div className="scheduleInfoDate">
-            {onData && formatToShowDate(onData.start)}
+            {onTitleMemo && formatToShowDate(onTitleMemo.start)}
           </div>
 
           <div className="scheduleInfoDate">
-            {onData && formatToShowDate(onData.end, onData.allday)}
+            {onTitleMemo &&
+              formatToShowDate(onTitleMemo.end, onTitleMemo.allday)}
           </div>
         </div>
-        <div className="todoMemo">{onData && onData.memo}</div>
+        <div className="todoMemo">{onTitleMemo && onTitleMemo.memo}</div>
       </div>
       <div className="footerButton">
         <button className="buttonDesign" onClick={DeleteDate}>
