@@ -15,6 +15,7 @@ import { useMutation } from "react-query";
 import { onLoadData } from "../service/portal/calendar";
 import { submitSchedule } from "../service/portal/calendar";
 import { updateSchedule } from "../service/portal/calendar";
+import { all } from "axios";
 const Container = styled.div`
   display: flex;
   overflow: hidden;
@@ -302,12 +303,10 @@ const BigCalendarInfo = () => {
 
   //보여줄 시간 양식을 재포맷
   const formatToShowDate = (jsDateStr, allday) => {
-    console.log(jsDateStr);
-    console.log(allday);
     const date = new Date(jsDateStr);
     const month = date.getMonth() + 1;
     let day = "";
-    allday === 0 ? (day = date.getDate() - 1) : (day = date.getDate());
+    allday === "0" ? (day = date.getDate() - 1) : (day = date.getDate());
     const weekday = date.getDay();
     const week = ["일", "월", "화", "수", "목", "금", "토"];
     const formattedDate = `${month}월 ${day}일 (${week[weekday]}요일)`;
