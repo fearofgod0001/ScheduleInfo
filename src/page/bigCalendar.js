@@ -15,7 +15,6 @@ import { useMutation } from "react-query";
 import { onLoadData } from "../service/portal/calendar";
 import { submitSchedule } from "../service/portal/calendar";
 import { updateSchedule } from "../service/portal/calendar";
-import { all } from "axios";
 const Container = styled.div`
   display: flex;
   overflow: hidden;
@@ -69,7 +68,7 @@ const Container = styled.div`
     }
   }
   .middleArticle {
-    width: 80%;
+    width: 100%;
     height: 100%;
 
     .rbc-row.rbc-month-header {
@@ -266,7 +265,6 @@ const BigCalendarInfo = () => {
   //이벤트 이동 기능
   const moveEvent = useCallback(
     ({ event, start, end }) => {
-      console.log(event);
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
         const filtered = prev.filter((ev) => ev.id !== event.id);
