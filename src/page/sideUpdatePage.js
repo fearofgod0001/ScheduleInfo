@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { useMutation } from "react-query";
 import { deleteSchedule } from "../service/portal/calendar";
+import UpdateDateModal from "./updateDateModal";
 
 const Container = styled.div`
   width: 400px;
@@ -88,7 +89,8 @@ const Container = styled.div`
 `;
 
 const InputDatePage = (props) => {
-  const { close, onData, refetchOnLoadData, formatToShowDate } = props;
+  const { close, onData, refetchOnLoadData, formatToShowDate, onFormatChange } =
+    props;
 
   //창을 닫을 컴포넌트
   const onCloseSidePage = () => {
@@ -117,11 +119,29 @@ const InputDatePage = (props) => {
     close(onData);
   };
 
+  //모달창을 띄울 useState
+  const [onModal, setOnModal] = useState(0);
+
+  //모달을 닫을 함수
+  const closeSetOnData = () => {
+    setOnModal(0);
+  };
+
   //데이터를 수정할 컴포넌트
-  const UpdateDate = () => {};
+  const UpdateDate = () => {
+    setOnModal(500);
+  };
 
   return (
     <Container>
+      <UpdateDateModal
+        open={onModal}
+        close={closeSetOnData}
+        events={onData && onData}
+        refetchOnLoadData={refetchOnLoadData}
+        onFormatChange={onFormatChange}
+        formatToShowDate={formatToShowDate}
+      />
       <div className="topButton">
         <button className="closeButton" onClick={onCloseSidePage}>
           x

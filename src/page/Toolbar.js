@@ -35,7 +35,7 @@ export default function Toolbar(props) {
       <div className="rbc-toolbar">
         <span className="rbc-btn-group">
           <button onClick={navigate.bind(null, "PREV")}>＜</button>
-          <button onClick={navigate.bind(null, "TODAY")}>이번 달</button>
+          <button onClick={navigate.bind(null, "TODAY")}>TODAY</button>
           <button onClick={navigate.bind(null, "NEXT")}> ＞</button>
         </span>
         <span className="rbc-toolbar-label">

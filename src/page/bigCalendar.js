@@ -25,9 +25,7 @@ const Container = styled.div`
     min-width: 330px;
     height: 100vh;
     display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    flex-direction: column;
+    justify-content: center;
     .calManagement {
       width: 90%;
       height: 57%;
@@ -249,7 +247,7 @@ const BigCalendarInfo = () => {
     }
   }, [dataOnLoadData]);
 
-  //새로운 값을 입력할 유즈쿼리문
+  //값을 업데이트할 유즈쿼리문
   const {
     data: dataUpdate,
     mutate: mutateUpdate,
@@ -272,9 +270,11 @@ const BigCalendarInfo = () => {
         const filtered = prev.filter((ev) => ev.id !== event.id);
         mutateUpdate({
           id: existing.id,
+          title: event.title,
           allday: event.allday,
           start: formatToOracleDate(start),
           end: formatToOracleDate(end),
+          memo: event.memo,
         });
         return [...filtered, { ...existing, start, end }];
       });
@@ -290,7 +290,6 @@ const BigCalendarInfo = () => {
 
   //DB에 넣을 시간양식 재포맷
   const formatToOracleDate = (jsDateStr) => {
-    console.log(jsDateStr);
     const date = new Date(jsDateStr);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -298,7 +297,7 @@ const BigCalendarInfo = () => {
     const hour = date.getHours();
     const minutes = date.getMinutes();
     const formattedDate = `${year}-${month}-${day} ${hour}:${minutes}`;
-    console.log(formattedDate);
+
     return formattedDate;
   };
 
@@ -343,9 +342,11 @@ const BigCalendarInfo = () => {
         const filtered = prev.filter((ev) => ev.id !== event.id);
         mutateUpdate({
           id: existing.id,
+          title: event.title,
           allday: event.allday,
           start: formatToOracleDate(start),
           end: formatToOracleDate(end),
+          memo: event.memo,
         });
         return [...filtered, { ...existing, start, end }];
       });
@@ -447,6 +448,7 @@ const BigCalendarInfo = () => {
           close={openSideMenu}
           refetchOnLoadData={refetchOnLoadData}
           formatToShowDate={formatToShowDate}
+          onFormatChange={formatToOracleDate}
         />
         /
       </div>

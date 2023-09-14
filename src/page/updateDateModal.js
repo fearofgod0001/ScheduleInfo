@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { styled } from "styled-components";
-import { submitSchedule } from "../service/portal/calendar";
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
-import ToolbarMini from "./toolbarMini";
 import { useMutation } from "react-query";
+import { updateSchedule } from "../service/portal/calendar";
 
-const InputModalContainer = styled.div`
+const UpdateModalContainer = styled.div`
   position: fixed;
   top: 30%;
-  left: 38%;
+  right: 110%;
   width: 400px;
   z-index: 150;
   display: flex;
@@ -125,11 +122,10 @@ const InputModalContainer = styled.div`
   }
 `;
 
-const InputDateModal = (props) => {
+const UpdateDateModal = (props) => {
   const {
     open,
     close,
-    newEventData,
     events,
     refetchOnLoadData,
     onFormatChange,
@@ -137,11 +133,12 @@ const InputDateModal = (props) => {
   } = props;
   //   console.log(newEventData);
   //미니 캘린더의 크기를 조절할 스테이트
-  const [onCalendar, setOnCalendar] = useState(0);
-  const onOpenCalendar = () => {
-    if (onCalendar === 0) setOnCalendar(230);
-    else setOnCalendar(0);
-  };
+
+  useEffect(() => {
+    events && setEventTitle(events.title);
+    events && setEventMemo(events.memo);
+    console.log(events);
+  }, [events]);
 
   const [eventTitle, setEventTitle] = useState();
   const [eventMemo, setEventMemo] = useState();
@@ -156,62 +153,33 @@ const InputDateModal = (props) => {
 
   //새로운 값을 입력할 유즈쿼리문
   const {
-    data: dataSubmit,
-    mutate: mutateSubmit,
-    isSuccess: isSuccessSubmit,
-  } = useMutation("submitSchedule", submitSchedule);
+    data: dataUpdate,
+    mutate: mutateUpdate,
+    isSuccess: isSuccessUpdate,
+  } = useMutation("updateSchedule", updateSchedule);
 
-  const [onAllDay, setOnAllDay] = useState();
-  const [onEndDay, setEndDay] = useState();
-
-  //월과 달을 받아서 하루 종일인 event가 맞으면 23시간 59분을 더해서 1일 더 추가로 보여지게한다
+  //데이터 수정이 완료되면 리패치를 하여 재랜더링 되게 한다.
   useEffect(() => {
-    if (newEventData) {
-      const startDate = newEventData.slots[0];
-      const endDate = newEventData.slots[newEventData.slots.length - 1];
-      if (
-        startDate.getMonth() === endDate.getMonth() &&
-        startDate.getDate() === endDate.getDate()
-      ) {
-        setOnAllDay(false);
-        setEndDay(newEventData.slots[newEventData.slots.length - 1]);
-      } else {
-        setOnAllDay(true);
-        setEndDay(
-          new Date(
-            newEventData.slots[newEventData.slots.length - 1].getTime() +
-              23 * 60 * 60 * 1000 +
-              59 * 60 * 1000
-          )
-        );
-      }
+    if (isSuccessUpdate && dataUpdate) {
+      refetchOnLoadData();
+      close();
     }
-  }, [newEventData]);
+  }, [isSuccessUpdate, dataUpdate, refetchOnLoadData]);
 
   //event를 db에 넣어줄 mutation
-  const onSubmitEventData = () => {
-    mutateSubmit({
+  const onUpdateEventData = () => {
+    mutateUpdate({
+      id: events.id,
       title: eventTitle,
-      start: onFormatChange(newEventData.slots[0]),
-      end: onFormatChange(onEndDay),
-      allday: onAllDay,
+      start: onFormatChange(events.start),
+      end: onFormatChange(events.end),
+      allday: events.allday,
       memo: eventMemo,
     });
   };
 
-  //데이터 입력이 완료되면 리패치를 하여 재랜더링 되게 한다.
-  useEffect(() => {
-    if (isSuccessSubmit && dataSubmit) {
-      console.debug("## submit refetch => ", dataSubmit);
-      refetchOnLoadData();
-      close();
-      setEventTitle("");
-      setEventMemo("");
-    }
-  }, [isSuccessSubmit, dataSubmit, refetchOnLoadData]);
-
   return (
-    <InputModalContainer style={{ height: open }}>
+    <UpdateModalContainer style={{ height: open }}>
       <div className="inputModalHead">
         <button className="modalClose" onClick={close}>
           닫기
@@ -226,30 +194,13 @@ const InputDateModal = (props) => {
           onChange={onEventTitle}
         ></input>
         <div className="changeDate">
-          <button className="setDate" onClick={onOpenCalendar}>
-            {newEventData && formatToShowDate(newEventData.slots[0])}
+          <button className="setDate">
+            {events && formatToShowDate(events.start)}
           </button>
-          <button className="setDate" onClick={onOpenCalendar}>
-            {newEventData &&
-              formatToShowDate(
-                newEventData.slots[newEventData.slots.length - 1]
-              )}
+          <button className="setDate">
+            {events && formatToShowDate(events.end)}
           </button>
         </div>
-        <div className="inputCalendar" style={{ height: onCalendar }}>
-          <Calendar
-            localizer={momentLocalizer(moment)}
-            events={events}
-            selectable
-            style={{
-              backgroundColor: "white",
-              height: 230,
-              width: 280,
-            }}
-            components={{ toolbar: ToolbarMini }}
-          />
-        </div>
-
         <textarea
           className="inputTextArea"
           placeholder="내용을 입력하세요"
@@ -258,12 +209,12 @@ const InputDateModal = (props) => {
         ></textarea>
       </div>
       <div className="inputModalFooter">
-        <button className="modalSubmit" onClick={onSubmitEventData}>
+        <button className="modalSubmit" onClick={onUpdateEventData}>
           저장
         </button>
       </div>
-    </InputModalContainer>
+    </UpdateModalContainer>
   );
 };
 
-export default InputDateModal;
+export default UpdateDateModal;
