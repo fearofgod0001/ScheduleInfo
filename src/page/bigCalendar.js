@@ -259,6 +259,7 @@ const BigCalendarInfo = () => {
   useEffect(() => {
     if (isSuccessUpdate && dataUpdate) {
       refetchOnLoadData();
+      setOnClickEventData(dataUpdate.param);
     }
   }, [isSuccessUpdate, dataUpdate, refetchOnLoadData]);
 
@@ -413,6 +414,7 @@ const BigCalendarInfo = () => {
       </div>
       <div className="middleArticle">
         <DragAndDropCalendar
+          //시간 현지화
           localizer={localizer}
           //가져올 이벤트 값
           events={myEvents}
