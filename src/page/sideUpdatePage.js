@@ -95,6 +95,7 @@ const InputDatePage = (props) => {
   //창을 닫을 컴포넌트
   const onCloseSidePage = () => {
     close(onData);
+    setOnModal(0);
   };
 
   //데이터를 삭제할 쿼리
@@ -137,7 +138,7 @@ const InputDatePage = (props) => {
       <UpdateDateModal
         open={onModal}
         close={closeSetOnData}
-        events={onData && onData}
+        events={onData}
         refetchOnLoadData={refetchOnLoadData}
         onFormatChange={onFormatChange}
         formatToShowDate={formatToShowDate}
