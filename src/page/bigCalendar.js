@@ -306,10 +306,8 @@ const BigCalendarInfo = () => {
     const stDate = new Date(startDate);
     const month = date.getMonth() + 1;
     let day = "";
-    let weekday = "";
-    allday === "0"
-      ? (day = stDate.getDate()) && (weekday = stDate.getDay())
-      : (day = date.getDate()) && (weekday = date.getDay());
+    allday === "0" ? (day = stDate.getDate()) : (day = date.getDate());
+    const weekday = date.getDay();
     const week = ["일", "월", "화", "수", "목", "금", "토"];
     const formattedDate = `${month}월 ${day}일 (${week[weekday]}요일)`;
     return formattedDate;
