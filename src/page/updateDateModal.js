@@ -178,14 +178,19 @@ const UpdateDateModal = (props) => {
 
   useEffect(() => {
     setEndDay(events && events.end);
-    if (events && events.allday === true) setOnAllDay(true);
+    setOnAllDay(events && events.allday);
   }, [events]);
 
   useEffect(() => {
-    if (onAllDay === false)
+    if (events && events.allday === "1" && onAllDay === false)
       setEndDay(
         events &&
           new Date(events.end.getTime() - 23 * 60 * 60 * 1000 - 59 * 60 * 1000)
+      );
+    else if (events && events.allday === "0" && onAllDay === true)
+      setEndDay(
+        events &&
+          new Date(events.end.getTime() + 23 * 60 * 60 * 1000 + 59 * 60 * 1000)
       );
     else setEndDay(events && events.end);
   }, [onAllDay]);
@@ -249,7 +254,7 @@ const UpdateDateModal = (props) => {
         <textarea
           className="inputTextArea"
           placeholder="내용을 입력하세요"
-          value={eventMemo}
+          value={eventMemo || ""}
           onChange={onEventMemo}
         ></textarea>
       </div>
@@ -259,7 +264,7 @@ const UpdateDateModal = (props) => {
             type="checkbox"
             id="allDayCheck"
             className="allDayCheckBox"
-            checked={onAllDay}
+            checked={onAllDay || ""}
             onChange={handleCheckboxChange}
           />
           <label htmlFor="allDayCheck" className="allDayLabel">
