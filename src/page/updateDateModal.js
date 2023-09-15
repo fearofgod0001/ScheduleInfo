@@ -5,13 +5,14 @@ import { updateSchedule } from "../service/portal/calendar";
 
 const UpdateModalContainer = styled.div`
   position: fixed;
-  top: 30%;
+  top: 24%;
   right: 110%;
   width: 400px;
   z-index: 150;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
   background-color: white;
   border-radius: 7px;
   box-shadow: 5px 5px 30px #aaa;
@@ -103,13 +104,13 @@ const UpdateModalContainer = styled.div`
     }
   }
   .inputModalFooter {
-    width: 100%;
+    width: 95%;
     height: 13%;
     border-bottom-right-radius: 7px;
     border-bottom-left-radius: 7px;
     display: flex;
     align-items: center;
-    justify-content: end;
+    justify-content: space-between;
     .modalSubmit {
       width: 80px;
       height: 40px;
@@ -119,9 +120,33 @@ const UpdateModalContainer = styled.div`
       color: white;
       margin-right: 10px;
     }
+    .checkAllDayBox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .allDayCheckBox {
+        appearance: none;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(49, 116, 173);
+        border-radius: 0.35rem;
+
+        &:checked {
+          background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z'/%3e%3c/svg%3e");
+          background-size: 100% 100%;
+          background-color: rgba(49, 116, 173);
+        }
+      }
+      .allDayLabel {
+        display: flex;
+        align-items: center;
+        user-select: none;
+        font-size: 13px;
+      }
+    }
   }
 `;
-
 const UpdateDateModal = (props) => {
   const {
     open,
@@ -148,6 +173,26 @@ const UpdateDateModal = (props) => {
   const onEventMemo = (e) => {
     setEventMemo(e.target.value);
   };
+  const [onAllDay, setOnAllDay] = useState(true);
+  const [onEndDay, setEndDay] = useState();
+
+  useEffect(() => {
+    setEndDay(events && events.end);
+    if (events && events.allday === true) setOnAllDay(true);
+  }, [events]);
+
+  useEffect(() => {
+    if (onAllDay === false)
+      setEndDay(
+        events &&
+          new Date(events.end.getTime() - 23 * 60 * 60 * 1000 - 59 * 60 * 1000)
+      );
+    else setEndDay(events && events.end);
+  }, [onAllDay]);
+
+  const handleCheckboxChange = () => {
+    setOnAllDay(!onAllDay);
+  };
 
   //새로운 값을 입력할 유즈쿼리문
   const {
@@ -172,7 +217,7 @@ const UpdateDateModal = (props) => {
       id: events.id,
       title: eventTitle,
       start: onFormatChange(events.start),
-      end: onFormatChange(events.end),
+      end: onFormatChange(onEndDay),
       allday: events.allday,
       memo: eventMemo,
     });
@@ -198,7 +243,7 @@ const UpdateDateModal = (props) => {
             {events && formatToShowDate(events.start)}
           </button>
           <button className="setDate">
-            {events && formatToShowDate(events.end, events.allday)}
+            {events && formatToShowDate(onEndDay)}
           </button>
         </div>
         <textarea
@@ -209,6 +254,19 @@ const UpdateDateModal = (props) => {
         ></textarea>
       </div>
       <div className="inputModalFooter">
+        <div className="checkAllDayBox">
+          <input
+            type="checkbox"
+            id="allDayCheck"
+            className="allDayCheckBox"
+            checked={onAllDay}
+            onChange={handleCheckboxChange}
+          />
+          <label htmlFor="allDayCheck" className="allDayLabel">
+            종일
+          </label>
+        </div>
+
         <button className="modalSubmit" onClick={onUpdateEventData}>
           저장
         </button>
