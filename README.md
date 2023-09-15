@@ -8,16 +8,16 @@ npm install --save react-big-calendar<br/>
 DB DDL<br>  
 TABLE
 
-    CREATE TABLE "SCOTT"."SCHEDULEINFO" 
-     (	
-    "CALELDAR_ID" NUMBER(*,0), 
-  	"USER_ID" VARCHAR2(255), 
-  	"TITLE" VARCHAR2(255), 
-  	"ALLDAY" VARCHAR2(19),
-  	"START_DATE" DATE, 
-  	"END_DATE" DATE, 
-  	"MEMO" CLOB
-     )
+	    CREATE TABLE "SCOTT"."SCHEDULEINFO" 
+		     (	
+		    "CALELDAR_ID" NUMBER(*,0), 
+		  	"USER_ID" VARCHAR2(255), 
+		  	"TITLE" VARCHAR2(255), 
+		  	"ALLDAY" VARCHAR2(19),
+		  	"START_DATE" DATE, 
+		  	"END_DATE" DATE, 
+		  	"MEMO" CLOB
+		     )
   SEQUENCE
    
     CREATE SEQUENCE SEQ_CALENDAR_ID INCREMENT BY 1;<br/><br/>
