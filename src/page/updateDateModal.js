@@ -198,8 +198,7 @@ const UpdateDateModal = (props) => {
             {events && formatToShowDate(events.start)}
           </button>
           <button className="setDate">
-            {events &&
-              formatToShowDate(events.end, events.start, events.allday)}
+            {events && formatToShowDate(events.end, events.allday)}
           </button>
         </div>
         <textarea

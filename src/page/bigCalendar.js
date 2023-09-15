@@ -301,14 +301,13 @@ const BigCalendarInfo = () => {
   };
 
   //보여줄 시간 양식을 재포맷
-  const formatToShowDate = (jsDateStr, startDate, allday) => {
+  const formatToShowDate = (jsDateStr, allday) => {
     const date = new Date(jsDateStr);
-    const stDate = new Date(startDate);
     const month = date.getMonth() + 1;
     let day = "";
     let weekday = "";
     allday === "0"
-      ? (day = stDate.getDate()) && (weekday = stDate.getDay())
+      ? (day = date.getDate() - 1) && (weekday = date.getDay() - 1)
       : (day = date.getDate()) && (weekday = date.getDay());
     const week = ["일", "월", "화", "수", "목", "금", "토"];
     const formattedDate = `${month}월 ${day}일 (${week[weekday]}요일)`;
