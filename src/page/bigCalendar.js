@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
-import Toolbar from "./toolbar";
+import Toolbar from "./Toolbar";
 import ToolbarMini from "./toolbarMini";
 import InputDateModal from "./inputDateModal";
 import SideUpdatePage from "./sideUpdatePage";
@@ -301,11 +301,12 @@ const BigCalendarInfo = () => {
   };
 
   //보여줄 시간 양식을 재포맷
-  const formatToShowDate = (jsDateStr, allday) => {
+  const formatToShowDate = (jsDateStr, startDate, allday) => {
     const date = new Date(jsDateStr);
+    const stDate = new Date(startDate);
     const month = date.getMonth() + 1;
     let day = "";
-    allday === "0" ? (day = date.getDate() - 1) : (day = date.getDate());
+    allday === "0" ? (day = stDate.getDate()) : (day = date.getDate());
     const weekday = date.getDay();
     const week = ["일", "월", "화", "수", "목", "금", "토"];
     const formattedDate = `${month}월 ${day}일 (${week[weekday]}요일)`;
