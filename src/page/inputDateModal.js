@@ -8,13 +8,14 @@ import { useMutation } from "react-query";
 
 const InputModalContainer = styled.div`
   position: fixed;
-  top: 30%;
+  top: 24%;
   left: 38%;
   width: 400px;
   z-index: 150;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
   background-color: white;
   border-radius: 7px;
   box-shadow: 5px 5px 30px #aaa;
@@ -106,13 +107,13 @@ const InputModalContainer = styled.div`
     }
   }
   .inputModalFooter {
-    width: 100%;
+    width: 95%;
     height: 13%;
     border-bottom-right-radius: 7px;
     border-bottom-left-radius: 7px;
     display: flex;
     align-items: center;
-    justify-content: end;
+    justify-content: space-between;
     .modalSubmit {
       width: 80px;
       height: 40px;
@@ -121,6 +122,31 @@ const InputModalContainer = styled.div`
       background-color: rgba(49, 116, 173);
       color: white;
       margin-right: 10px;
+    }
+    .checkAllDayBox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .allDayCheckBox {
+        appearance: none;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(49, 116, 173);
+        border-radius: 0.35rem;
+
+        &:checked {
+          background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z'/%3e%3c/svg%3e");
+          background-size: 100% 100%;
+          background-color: rgba(49, 116, 173);
+        }
+      }
+      .allDayLabel {
+        display: flex;
+        align-items: center;
+        user-select: none;
+        font-size: 13px;
+      }
     }
   }
 `;
@@ -164,29 +190,35 @@ const InputDateModal = (props) => {
   const [onAllDay, setOnAllDay] = useState();
   const [onEndDay, setEndDay] = useState();
 
-  //월과 달을 받아서 하루 종일인 event가 맞으면 23시간 59분을 더해서 1일 더 추가로 보여지게한다
   useEffect(() => {
-    if (newEventData) {
-      const startDate = newEventData.slots[0];
-      const endDate = newEventData.slots[newEventData.slots.length - 1];
-      if (
-        startDate.getMonth() === endDate.getMonth() &&
-        startDate.getDate() === endDate.getDate()
-      ) {
-        setOnAllDay(false);
-        setEndDay(newEventData.slots[newEventData.slots.length - 1]);
-      } else {
-        setOnAllDay(true);
-        setEndDay(
+    setEndDay(
+      newEventData &&
+        new Date(
+          newEventData.slots[newEventData.slots.length - 1].getTime() +
+            23 * 60 * 60 * 1000 +
+            59 * 60 * 1000
+        )
+    );
+    setOnAllDay(true);
+  }, [newEventData]);
+
+  useEffect(() => {
+    if (onAllDay === false)
+      setEndDay(newEventData.slots[newEventData.slots.length - 1]);
+    else
+      setEndDay(
+        newEventData &&
           new Date(
             newEventData.slots[newEventData.slots.length - 1].getTime() +
               23 * 60 * 60 * 1000 +
               59 * 60 * 1000
           )
-        );
-      }
-    }
-  }, [newEventData]);
+      );
+  }, [onAllDay]);
+
+  const handleCheckboxChange = () => {
+    setOnAllDay(!onAllDay);
+  };
 
   //event를 db에 넣어줄 mutation
   const onSubmitEventData = () => {
@@ -258,6 +290,18 @@ const InputDateModal = (props) => {
         ></textarea>
       </div>
       <div className="inputModalFooter">
+        <div className="checkAllDayBox">
+          <input
+            type="checkbox"
+            id="allDayCheck"
+            className="allDayCheckBox"
+            checked={onAllDay}
+            onChange={handleCheckboxChange}
+          />
+          <label htmlFor="allDayCheck" className="allDayLabel">
+            종일
+          </label>
+        </div>
         <button className="modalSubmit" onClick={onSubmitEventData}>
           저장
         </button>
