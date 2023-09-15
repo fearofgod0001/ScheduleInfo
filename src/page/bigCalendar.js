@@ -438,7 +438,7 @@ const BigCalendarInfo = () => {
           resizable
           selectable
           style={{ height: "100vh", width: "100%" }}
-          // components={{ toolbar: Toolbar }}
+          components={{ toolbar: Toolbar }}
         />
       </div>
       <div
