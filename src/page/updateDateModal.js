@@ -158,13 +158,21 @@ const UpdateDateModal = (props) => {
     setOnTitleMemo,
   } = props;
 
-  useEffect(() => {
-    events && setEventTitle(events.title);
-    events && setEventMemo(events.memo);
-  }, [events]);
-
+  const [onAllDay, setOnAllDay] = useState(true);
+  const [onEndDay, setEndDay] = useState();
   const [eventTitle, setEventTitle] = useState();
   const [eventMemo, setEventMemo] = useState();
+
+  useEffect(() => {
+    console.log("### events check");
+    events && setEventTitle(events.title);
+    events && setEventMemo(events.memo);
+    events && setEndDay(events.end);
+    events && events.allday === "1" ? setOnAllDay(true) : setOnAllDay(false);
+    events && console.log(events.allday);
+    console.log(onAllDay);
+  }, [events]);
+
   //제목을 입력
   const onEventTitle = (e) => {
     setEventTitle(e.target.value);
@@ -173,13 +181,6 @@ const UpdateDateModal = (props) => {
   const onEventMemo = (e) => {
     setEventMemo(e.target.value);
   };
-  const [onAllDay, setOnAllDay] = useState(true);
-  const [onEndDay, setEndDay] = useState();
-
-  useEffect(() => {
-    setEndDay(events && events.end);
-    setOnAllDay(events && events.allday);
-  }, [events]);
 
   useEffect(() => {
     if (events && events.allday === "1" && onAllDay === false)
